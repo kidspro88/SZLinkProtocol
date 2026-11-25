@@ -89,6 +89,20 @@ jobs:
         run: |
           ./scripts/test.sh py
 
+  szlink-tests:
+    name: SZ-Link C library tests
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: 'recursive'
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+      - run: pip install -r pymavlink/requirements.txt
+      - name: Generate szlink headers and run tests
+        run: ./scripts/test_szlink.sh
+
   build-cmake-c-example:
     name: Build cmake C example
     runs-on: ubuntu-22.04

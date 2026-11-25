@@ -82,6 +82,11 @@
     messages: 53000 - 53999
     commands: 53000 - 53999
   -->
+  <!-- spacezet.xml range of IDs (SZ-Link fork, not allocated upstream):
+    messages: 54000 - 54099
+    commands: 54000 - 54099
+  -->
+  <include>spacezet.xml</include>
   <!--Next range to allocate range of IDs:
     messages: 52610 - 52619 (< 53000 - then allocate 54000 to 60000)
     commands: 52610 - 52619 (< 53000 - then allocate 54000 to 60000)

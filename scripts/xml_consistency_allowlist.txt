@@ -49,7 +49,3 @@ common.xml: Enum: MAV_FTP_OPCODE is unused
 minimal.xml: Enum: MAV_MODE_FLAG_DECODE_POSITION is unused
 minimal.xml: Enum: MAV_COMPONENT is unused
 standard.xml: Enum: FIRMWARE_VERSION_TYPE is unused
-
-# --- SZ-Link: enums used by the SZ-Link frame header (LCID/SEC bytes), not by message fields ---
-spacezet.xml: Enum: SZ_LCID is unused
-spacezet.xml: Enum: SZ_SEC_FLAGS is unused

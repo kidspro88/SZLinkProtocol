@@ -1,0 +1,79 @@
+<?xml version="1.0"?>
+<!--
+SZ-Link: SpaceZet SDR link protocol, based on the MAVLink 2 frame format.
+Range of IDs:
+  messages: 54000 - 54099
+  commands: 54000 - 54099
+Documentation:
+  SZ-Link adds a Logical Channel ID (LCID) and a security flag byte (SEC) to the
+  MAVLink 2 frame so that RC, telemetry and video can be multiplexed on one SDR link.
+  Dialect name is "spacezet"; the protocol and generated C API are "szlink" (see szlink/README.md).
+-->
+<mavlink>
+  <include>common.xml</include>
+  <enums>
+    <enum name="SZ_LCID">
+      <description>SZ-Link logical channel, carried in the LCID byte of every SZ-Link frame. Lower values have higher QoS priority.</description>
+      <entry value="0" name="SZ_LCID_RC">
+        <description>RC uplink (SZ_RC_CMD), 50-150 Hz, latency below 20 ms.</description>
+      </entry>
+      <entry value="1" name="SZ_LCID_TELEMETRY">
+        <description>Telemetry: standard MAVLink messages (HEARTBEAT, GPS_RAW_INT, SYS_STATUS, ATTITUDE, BATTERY_STATUS, ...).</description>
+      </entry>
+      <entry value="2" name="SZ_LCID_VIDEO">
+        <description>Video downlink (SZ_VIDEO_PKT).</description>
+      </entry>
+    </enum>
+    <enum name="SZ_SEC_FLAGS" bitmask="true">
+      <description>Flags carried in the SEC byte of every SZ-Link frame.</description>
+      <entry value="1" name="SZ_SEC_FLAGS_ENCRYPTED">
+        <description>Payload is encrypted (AES-256).</description>
+      </entry>
+      <entry value="2" name="SZ_SEC_FLAGS_FEC">
+        <description>Frame is protected by forward error correction.</description>
+      </entry>
+    </enum>
+    <enum name="SZ_VIDEO_CODEC">
+      <description>Video codec of the stream carried in SZ_VIDEO_PKT.</description>
+      <entry value="0" name="SZ_VIDEO_CODEC_H264">
+        <description>H.264 / AVC.</description>
+      </entry>
+      <entry value="1" name="SZ_VIDEO_CODEC_H265">
+        <description>H.265 / HEVC.</description>
+      </entry>
+    </enum>
+    <enum name="SZ_VIDEO_PKT_FLAGS" bitmask="true">
+      <description>Flags for SZ_VIDEO_PKT.</description>
+      <entry value="1" name="SZ_VIDEO_PKT_FLAGS_KEYFRAME">
+        <description>Fragment belongs to a keyframe (IDR).</description>
+      </entry>
+      <entry value="2" name="SZ_VIDEO_PKT_FLAGS_NAL_START">
+        <description>Fragment is the first fragment of a NAL unit.</description>
+      </entry>
+      <entry value="4" name="SZ_VIDEO_PKT_FLAGS_NAL_END">
+        <description>Fragment is the last fragment of a NAL unit.</description>
+      </entry>
+    </enum>
+  </enums>
+  <messages>
+    <message id="54000" name="SZ_RC_CMD">
+      <description>RC control command from the ground controller to the vehicle. Sent on SZ_LCID_RC at 50-150 Hz.</description>
+      <field type="uint8_t" name="target_system">System ID.</field>
+      <field type="uint8_t" name="target_component">Component ID.</field>
+      <field type="int16_t" name="roll" minValue="-10000" maxValue="10000">Roll axis, normalized to [-10000, 10000].</field>
+      <field type="int16_t" name="pitch" minValue="-10000" maxValue="10000">Pitch axis, normalized to [-10000, 10000].</field>
+      <field type="int16_t" name="yaw" minValue="-10000" maxValue="10000">Yaw axis, normalized to [-10000, 10000].</field>
+      <field type="uint16_t" name="throttle" minValue="0" maxValue="10000">Throttle, normalized to [0, 10000].</field>
+    </message>
+    <message id="54001" name="SZ_VIDEO_PKT">
+      <description>Fragment of an H.264/H.265 NAL unit. Sent on SZ_LCID_VIDEO.</description>
+      <field type="uint16_t" name="frame_seq">Video frame sequence number (wraps).</field>
+      <field type="uint8_t" name="frag_index">Index of this fragment within the NAL unit.</field>
+      <field type="uint8_t" name="frag_count">Number of fragments in the NAL unit.</field>
+      <field type="uint8_t" name="codec" enum="SZ_VIDEO_CODEC">Video codec.</field>
+      <field type="uint8_t" name="flags" enum="SZ_VIDEO_PKT_FLAGS">Fragment flags.</field>
+      <field type="uint8_t" name="len" units="bytes">Number of valid bytes in data.</field>
+      <field type="uint8_t[248]" name="data">NAL unit fragment.</field>
+    </message>
+  </messages>
+</mavlink>

@@ -25,12 +25,21 @@ Documentation:
       </entry>
     </enum>
     <enum name="SZ_SEC_FLAGS" bitmask="true">
-      <description>Flags carried in the SEC byte of every SZ-Link frame.</description>
+      <description>Flags carried in the SEC byte of every SZ-Link frame. Bits 1-2 hold the key epoch (0-3, the 30 s key ratchet step modulo 4). When SZ_SEC_FLAGS_ENCRYPTED or SZ_SEC_FLAGS_SIGNED is set, an authentication tag (8 bytes on SZ_LCID_RC, 16 bytes otherwise) follows the SEC byte.</description>
       <entry value="1" name="SZ_SEC_FLAGS_ENCRYPTED">
-        <description>Payload is encrypted (AES-256).</description>
+        <description>Payload is encrypted and authenticated (ChaCha20-Poly1305).</description>
       </entry>
-      <entry value="2" name="SZ_SEC_FLAGS_FEC">
-        <description>Frame is protected by forward error correction.</description>
+      <entry value="2" name="SZ_SEC_FLAGS_EPOCH_BIT0">
+        <description>Key epoch, bit 0.</description>
+      </entry>
+      <entry value="4" name="SZ_SEC_FLAGS_EPOCH_BIT1">
+        <description>Key epoch, bit 1.</description>
+      </entry>
+      <entry value="8" name="SZ_SEC_FLAGS_FEC">
+        <description>Frame is sent inside a Reed-Solomon FEC envelope (video channel).</description>
+      </entry>
+      <entry value="16" name="SZ_SEC_FLAGS_SIGNED">
+        <description>Payload is sent in clear but authenticated (signed) with a tag.</description>
       </entry>
     </enum>
     <enum name="SZ_VIDEO_CODEC">
@@ -74,6 +83,18 @@ Documentation:
       <field type="uint8_t" name="flags" enum="SZ_VIDEO_PKT_FLAGS">Fragment flags.</field>
       <field type="uint8_t" name="len" units="bytes">Number of valid bytes in data.</field>
       <field type="uint8_t[248]" name="data">NAL unit fragment.</field>
+    </message>
+    <message id="54002" name="SZ_KEX_INIT">
+      <description>SZ-Link key exchange, first message (Noise_IK_25519_ChaChaPoly_BLAKE2b, "-&gt; e, es, s, ss" with an 8-byte timestamp payload). Sent by the ground station on SZ_LCID_TELEMETRY, unprotected, to start a session and again about every 10 minutes to rekey.</description>
+      <field type="uint8_t" name="target_system">System ID.</field>
+      <field type="uint8_t" name="target_component">Component ID.</field>
+      <field type="uint8_t[104]" name="handshake">Noise handshake message: ephemeral key (32), encrypted static key (48), encrypted timestamp (24).</field>
+    </message>
+    <message id="54003" name="SZ_KEX_RESP">
+      <description>SZ-Link key exchange, second message (Noise_IK "&lt;- e, ee, se"). Sent by the vehicle on SZ_LCID_TELEMETRY, unprotected, in reply to a valid SZ_KEX_INIT from its paired ground station.</description>
+      <field type="uint8_t" name="target_system">System ID.</field>
+      <field type="uint8_t" name="target_component">Component ID.</field>
+      <field type="uint8_t[48]" name="handshake">Noise handshake message: ephemeral key (32), authentication tag (16).</field>
     </message>
   </messages>
 </mavlink>

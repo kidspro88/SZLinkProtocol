@@ -2,6 +2,8 @@
  * Tests for the SZ-Link frame layer (szlink_frame.h) on top of the generated,
  * szlink-prefixed spacezet dialect. Built and run by scripts/test_szlink.sh.
  */
+#define SZLINK_SEC_IMPLEMENTATION
+#define SZLINK_ECC_IMPLEMENTATION
 #include "spacezet/szlink.h"
 #include "szlink_frame.h"
 
@@ -77,11 +79,12 @@ static void test_standard_mavlink_message_on_telemetry(void)
 
     szlink_msg_heartbeat_pack(1, 1, &tx, MAV_TYPE_QUADROTOR, MAV_AUTOPILOT_GENERIC,
                               MAV_MODE_FLAG_SAFETY_ARMED, 0, MAV_STATE_ACTIVE);
-    n = szlink_frame_serialize(buf, &tx, SZ_LCID_TELEMETRY, SZ_SEC_FLAGS_FEC);
+    n = szlink_frame_serialize(buf, &tx, SZ_LCID_TELEMETRY, SZ_SEC_FLAGS_EPOCH_BIT1);
     szlink_frame_parser_init(&p);
     CHECK(feed(&p, buf, n, &rx, &lcid, &sec) == 1);
     CHECK(lcid == SZ_LCID_TELEMETRY);
-    CHECK(sec == SZ_SEC_FLAGS_FEC);
+    CHECK(sec == SZ_SEC_FLAGS_EPOCH_BIT1);
+    CHECK(!p.authenticated);
     szlink_msg_heartbeat_decode(&rx, &hb);
     CHECK(hb.type == MAV_TYPE_QUADROTOR);
     CHECK(hb.base_mode == MAV_MODE_FLAG_SAFETY_ARMED);
@@ -110,12 +113,14 @@ static void test_video_pkt_full_payload(void)
     }
     szlink_msg_sz_video_pkt_encode(7, 100, &tx, &pkt);
     CHECK(tx.len == SZLINK_MSG_ID_SZ_VIDEO_PKT_LEN);
-    n = szlink_frame_serialize(buf, &tx, SZ_LCID_VIDEO, SZ_SEC_FLAGS_ENCRYPTED);
-    CHECK(n == SZLINK_FRAME_MAX_LEN);
+    /* protected frames need szlink_frame_serialize_secure */
+    CHECK(szlink_frame_serialize(buf, &tx, SZ_LCID_VIDEO, SZ_SEC_FLAGS_ENCRYPTED) == 0);
+    n = szlink_frame_serialize(buf, &tx, SZ_LCID_VIDEO, 0);
+    CHECK(n == SZLINK_FRAME_OVERHEAD + 255);
 
     szlink_frame_parser_init(&p);
     CHECK(feed(&p, buf, n, &rx, &lcid, &sec) == 1);
-    CHECK(lcid == SZ_LCID_VIDEO && sec == SZ_SEC_FLAGS_ENCRYPTED);
+    CHECK(lcid == SZ_LCID_VIDEO && sec == 0);
     memset(&out, 0, sizeof(out));
     szlink_msg_sz_video_pkt_decode(&rx, &out);
     /* Compare field by field: the struct may have trailing padding. */

@@ -44,6 +44,8 @@ __all__ = [
     "aead_open",
     "x25519",
     "x25519_public",
+    "keys_from_secret",
+    "keys_from_passphrase",
     "HandshakeInitiator",
     "HandshakeResponder",
 ]
@@ -135,6 +137,22 @@ def x25519(private: bytes, public: bytes) -> bytes:
 def x25519_public(private: bytes) -> bytes:
     return X25519PrivateKey.from_private_bytes(private).public_key().public_bytes(
         Encoding.Raw, PublicFormat.Raw)
+
+
+def keys_from_secret(secret: bytes) -> tuple[bytes, bytes]:
+    """``(vehicle_private, ground_private)`` derived from a shared 32-byte secret.
+
+    The secret is the MAVLink 2 signing key, so a vehicle is paired with the
+    ground station that set up signing on it.
+    """
+    if len(secret) != 32:
+        raise ValueError("secret must be 32 bytes")
+    return hkdf_expand32(secret, b"SZL vehicle key"), hkdf_expand32(secret, b"SZL ground key")
+
+
+def keys_from_passphrase(passphrase: str) -> tuple[bytes, bytes]:
+    """Same as MAVProxy ``signing setup <passphrase>``: secret = SHA-256(passphrase)."""
+    return keys_from_secret(hashlib.sha256(passphrase.encode()).digest())
 
 
 def x25519_generate() -> bytes:

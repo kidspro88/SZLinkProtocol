@@ -25,6 +25,7 @@ GCS_EPH = bytes(range(201, 233))
 VEH_EPH = bytes((i * 7 + 3) & 0xFF for i in range(32))
 TIMESTAMP_US = 1_764_000_000_000_000
 FEC_NSYM = 16
+SHARED_SECRET = bytes(range(0x40, 0x60))
 
 MSGS = {0: (50, 9), 54000: (58, 10), 54001: (141, 255)}
 
@@ -69,7 +70,10 @@ def render() -> str:
            f"#define TV_FEC_NSYM {FEC_NSYM}u", "",
            c_bytes("tv_gcs_priv", GCS_PRIV), c_bytes("tv_veh_priv", VEH_PRIV),
            c_bytes("tv_gcs_eph", GCS_EPH), c_bytes("tv_veh_eph", VEH_EPH),
-           c_bytes("tv_kex_init", kex_init), c_bytes("tv_kex_resp", kex_resp)]
+           c_bytes("tv_kex_init", kex_init), c_bytes("tv_kex_resp", kex_resp),
+           c_bytes("tv_secret", SHARED_SECRET),
+           c_bytes("tv_secret_vehicle_pub", crypto.x25519_public(crypto.keys_from_secret(SHARED_SECRET)[0])),
+           c_bytes("tv_secret_ground_pub", crypto.x25519_public(crypto.keys_from_secret(SHARED_SECRET)[1]))]
     entries = []
     for i, (direction, msgid, lcid, mode, t, sysid, compid, payload, wire) in enumerate(frames):
         out.append(c_bytes(f"tv_frame{i}_payload", payload))

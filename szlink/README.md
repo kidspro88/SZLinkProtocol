@@ -76,7 +76,11 @@ if (szlink_frame_parse_char(&parser, c, &msg, &lcid, &sec)) {
 
 **Pairing.** The ground station (initiator) and the vehicle (responder) each have
 a static X25519 key pair. The ground station knows the vehicle's public key and
-the vehicle accepts only its paired ground station.
+the vehicle accepts only its paired ground station. The keys can be any X25519
+keys; the ArduPilot port derives both from the MAVLink 2 signing key the
+vehicle and ground station already share (`szlink_sec_keys_from_secret`,
+`crypto.keys_from_passphrase` = SHA-256 of the MAVProxy `signing setup`
+passphrase), so pairing is the existing signing setup over USB.
 
 **Handshake.** `Noise_IK_25519_ChaChaPoly_BLAKE2b`, prologue `SZ-Link v1`. The
 ground station sends `SZ_KEX_INIT` (104 bytes: `-> e, es, s, ss` plus an 8-byte

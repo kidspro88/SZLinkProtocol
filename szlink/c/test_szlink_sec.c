@@ -94,6 +94,16 @@ static void test_vectors_handshake(void)
     CHECK(gcs.cur.valid && veh.pending.valid && !veh.cur.valid);
 }
 
+static void test_keys_from_secret(void)
+{
+    uint8_t v[32], g[32], pub[32];
+    szlink_sec_keys_from_secret(tv_secret, v, g);
+    szlink_sec_public_key(pub, v);
+    CHECK(memcmp(pub, tv_secret_vehicle_pub, 32) == 0);
+    szlink_sec_public_key(pub, g);
+    CHECK(memcmp(pub, tv_secret_ground_pub, 32) == 0);
+}
+
 static void test_vectors_frames(void)
 {
     size_t i;
@@ -337,6 +347,7 @@ static void test_fec_frames(void)
 int main(void)
 {
     test_rfc8439_aead();
+    test_keys_from_secret();
     test_vectors_handshake();
     test_vectors_frames();
     test_tamper_replay_and_strangers();

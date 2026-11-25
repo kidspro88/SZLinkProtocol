@@ -149,6 +149,15 @@ void szlink_sec_init(szlink_sec_t *s, uint8_t role, const uint8_t s_priv[32],
 /** Wipe all key material. */
 void szlink_sec_wipe(szlink_sec_t *s);
 
+/**
+ * Derive both static private keys from one 32-byte shared secret (the
+ * MAVLink 2 signing key: SHA-256 of the passphrase given to
+ * `signing setup` in MAVProxy, or set with SETUP_SIGNING). Lets a vehicle
+ * and its ground station be paired with the key they already share.
+ */
+void szlink_sec_keys_from_secret(const uint8_t secret[32], uint8_t vehicle_priv[32],
+                                 uint8_t ground_priv[32]);
+
 /** Static public key of a private key. */
 void szlink_sec_public_key(uint8_t pub[32], const uint8_t priv[32]);
 
@@ -199,7 +208,11 @@ int szlink_sec_open(szlink_sec_t *s, const uint8_t hdr[SZLINK_SEC_HEADER_LEN], u
 #ifdef SZLINK_SEC_IMPLEMENTATION
 
 #include <string.h>
-#include "monocypher.h"
+/* ArduPilot: -DSZLINK_SEC_MONOCYPHER_HEADER='<AP_CheckFirmware/monocypher.h>' */
+#ifndef SZLINK_SEC_MONOCYPHER_HEADER
+#define SZLINK_SEC_MONOCYPHER_HEADER "monocypher.h"
+#endif
+#include SZLINK_SEC_MONOCYPHER_HEADER
 
 #ifdef __cplusplus
 extern "C" {
@@ -258,7 +271,7 @@ static void szlink_sec_hkdf2_(const uint8_t ck[64], const uint8_t *ikm, size_t i
 static void szlink_sec_expand32_(uint8_t out[32], const uint8_t prk[32], const char *label,
                                  const uint8_t *extra, size_t extra_len)
 {
-    uint8_t info[16];
+    uint8_t info[32];
     uint8_t full[64];
     size_t n = strlen(label);
     memcpy(info, label, n);
@@ -325,6 +338,13 @@ static int szlink_sec_dh_(uint8_t out[32], const uint8_t priv[32], const uint8_t
         d |= out[i];
     }
     return d != 0; /* reject low-order points */
+}
+
+void szlink_sec_keys_from_secret(const uint8_t secret[32], uint8_t vehicle_priv[32],
+                                 uint8_t ground_priv[32])
+{
+    szlink_sec_expand32_(vehicle_priv, secret, "SZL vehicle key", NULL, 0);
+    szlink_sec_expand32_(ground_priv, secret, "SZL ground key", NULL, 0);
 }
 
 void szlink_sec_public_key(uint8_t pub[32], const uint8_t priv[32])

@@ -170,6 +170,44 @@ static void test_stream_with_garbage_and_resync(void)
     CHECK(p.rx_ok == 3);
 }
 
+static void test_frames_after_long_false_start(void)
+{
+    /* A fake STX with a large LEN makes the parser buffer several real frames
+       before the fake frame fails; every one of them must still be decoded. */
+    szlink_message_t tx, rx;
+    szlink_frame_parser_t p;
+    uint8_t stream[4 * SZLINK_FRAME_MAX_LEN];
+    uint8_t lcid, sec;
+    size_t len = 0;
+    int k;
+
+    stream[len++] = SZLINK_FRAME_STX;
+    stream[len++] = 200;
+    for (k = 0; k < 12; k++) {
+        szlink_msg_sz_rc_cmd_pack(1, 1, &tx, 1, 1, (int16_t)k, 0, 0, 0);
+        len += szlink_frame_serialize(stream + len, &tx, SZ_LCID_RC, 0);
+    }
+    szlink_frame_parser_init(&p);
+    CHECK(feed(&p, stream, len, &rx, &lcid, &sec) == 12);
+    CHECK(p.rx_ok == 12);
+}
+
+static void test_oversized_len_dropped(void)
+{
+    szlink_message_t tx, rx;
+    szlink_frame_parser_t p;
+    uint8_t buf[SZLINK_FRAME_MAX_LEN];
+    uint8_t lcid, sec;
+    uint16_t n;
+
+    szlink_msg_sz_rc_cmd_pack(1, 1, &tx, 1, 1, 0, 0, 0, 0);
+    tx.len = SZLINK_MSG_ID_SZ_RC_CMD_LEN + 1; /* CRC-valid, but longer than the message */
+    n = szlink_frame_serialize(buf, &tx, SZ_LCID_RC, 0);
+    szlink_frame_parser_init(&p);
+    CHECK(feed(&p, buf, n, &rx, &lcid, &sec) == 0);
+    CHECK(p.len_errors == 1 && p.rx_ok == 0);
+}
+
 static void test_unknown_msgid_dropped(void)
 {
     szlink_message_t tx, rx;
@@ -202,6 +240,8 @@ int main(void)
     test_video_pkt_full_payload();
     test_corruption_is_rejected();
     test_stream_with_garbage_and_resync();
+    test_frames_after_long_false_start();
+    test_oversized_len_dropped();
     test_unknown_msgid_dropped();
     test_wide_sysid_rejected();
     if (failures) {

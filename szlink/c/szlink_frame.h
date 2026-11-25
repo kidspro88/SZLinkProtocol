@@ -46,6 +46,7 @@ typedef struct {
     uint32_t rx_ok;         /* frames accepted */
     uint32_t crc_errors;    /* frames dropped for a bad CRC */
     uint32_t unknown_msgid; /* frames dropped because the msgid is unknown */
+    uint32_t len_errors;    /* frames dropped because LEN exceeds the message's max length */
 } szlink_frame_parser_t;
 
 static inline uint16_t szlink_frame_crc(const uint8_t *frame, uint8_t len, uint8_t crc_extra)
@@ -113,6 +114,10 @@ static inline int szlink_frame_check_(szlink_frame_parser_t *p, szlink_message_t
         p->unknown_msgid++;
         return 0;
     }
+    if (len > e->max_msg_len) {
+        p->len_errors++;
+        return 0;
+    }
     crc = szlink_frame_crc(b, len, e->crc_extra);
     rx_crc = (uint16_t)(b[SZLINK_FRAME_HEADER_LEN + len + 1u] |
                         (b[SZLINK_FRAME_HEADER_LEN + len + 2u] << 8));
@@ -135,6 +140,17 @@ static inline int szlink_frame_check_(szlink_frame_parser_t *p, szlink_message_t
     return 1;
 }
 
+/* Drop the first n buffered bytes, then any bytes before the next STX. */
+static inline void szlink_frame_consume_(szlink_frame_parser_t *p, uint16_t n)
+{
+    uint16_t k = n;
+    while (k < p->idx && p->buf[k] != SZLINK_FRAME_STX) {
+        k++;
+    }
+    memmove(p->buf, &p->buf[k], (size_t)(p->idx - k));
+    p->idx = (uint16_t)(p->idx - k);
+}
+
 /**
  * Feed one received byte.
  *
@@ -142,7 +158,9 @@ static inline int szlink_frame_check_(szlink_frame_parser_t *p, szlink_message_t
  *         msg / lcid / sec; 0 otherwise.
  *
  * After a bad frame the parser rescans the buffered bytes for the next STX,
- * so a frame that starts inside a corrupted one is not lost. This is
+ * so a frame that starts inside a corrupted one is not lost. Bytes buffered
+ * after a decoded frame are kept: if they already hold further complete
+ * frames, those are returned by the following calls, one per call. This is
  * iterative and uses no extra stack beyond a few locals.
  */
 static inline int szlink_frame_parse_char(szlink_frame_parser_t *p, uint8_t c,
@@ -154,7 +172,7 @@ static inline int szlink_frame_parse_char(szlink_frame_parser_t *p, uint8_t c,
     p->buf[p->idx++] = c;
 
     for (;;) {
-        uint16_t need, k;
+        uint16_t need;
         if (p->idx < 2u) {
             return 0;
         }
@@ -162,16 +180,13 @@ static inline int szlink_frame_parse_char(szlink_frame_parser_t *p, uint8_t c,
         if (p->idx < need) {
             return 0;
         }
-        /* p->idx == need: a complete frame is buffered. */
+        /* A complete frame is buffered, possibly followed by more bytes. */
         if (szlink_frame_check_(p, msg, lcid, sec)) {
-            p->idx = 0;
+            szlink_frame_consume_(p, need);
             return 1;
         }
         /* Bad frame: restart at the next STX after the current one. */
-        for (k = 1; k < p->idx && p->buf[k] != SZLINK_FRAME_STX; k++) {
-        }
-        memmove(p->buf, &p->buf[k], (size_t)(p->idx - k));
-        p->idx = (uint16_t)(p->idx - k);
+        szlink_frame_consume_(p, 1u);
         /* The shifted bytes may already hold a complete frame: loop. */
     }
 }

@@ -172,7 +172,7 @@ jobs:
 
   deploy:
     name: Generate and push C headers
-    needs: [format, xml-consistency, spell-check, python-lint, python-tests, node-tests]
+    needs: [format, xml-consistency, spell-check, python-lint, python-tests, node-tests, szlink-tests]
     runs-on: ubuntu-22.04
     # Pushes generated headers to mavlink/c_library_v1 and c_library_v2 with
     # upstream's secrets: only run in mavlink/mavlink, not in forks (where a

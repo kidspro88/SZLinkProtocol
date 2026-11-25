@@ -3,7 +3,12 @@
 set -euo pipefail
 
 SRC_DIR=$(cd "$(dirname "$0")/.." && pwd)
-OUT=${SZLINK_BUILD_DIR:-$(mktemp -d)}
+if [ -n "${SZLINK_BUILD_DIR:-}" ]; then
+    OUT=$SZLINK_BUILD_DIR
+else
+    OUT=$(mktemp -d)
+    trap 'rm -rf "$OUT"' EXIT
+fi
 
 python3 "$SRC_DIR/scripts/szlinkgen.py" --output "$OUT/include"
 python3 -m unittest discover -s "$SRC_DIR/scripts" -p 'test_szlinkgen.py' -v

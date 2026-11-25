@@ -24,6 +24,38 @@ class RenameTest(unittest.TestCase):
         src = "MAV_TYPE_QUADROTOR _MAV_PAYLOAD(msg) MAV_CMD_NAV_TAKEOFF"
         self.assertEqual(szlinkgen.rename_text(src), src)
 
+    def test_mav_enum_containing_mavlink_untouched(self):
+        src = "MAV_PROTOCOL_CAPABILITY_MAVLINK2=4, /* uses MAVLINK2 */"
+        self.assertEqual(szlinkgen.rename_text(src),
+                         "MAV_PROTOCOL_CAPABILITY_MAVLINK2=4, /* uses SZLINK2 */")
+
+    def test_mavlink_io_links_untouched(self):
+        src = "see https://mavlink.io/en/guide/xml_schema.html#MAV_CMD for mavlink_msg"
+        self.assertEqual(szlinkgen.rename_text(src),
+                         "see https://mavlink.io/en/guide/xml_schema.html#MAV_CMD for szlink_msg")
+
+    def test_find_leftovers_ignores_kept_tokens(self):
+        with tempfile.TemporaryDirectory() as root:
+            with open(os.path.join(root, "x.h"), "w") as f:
+                f.write("MAV_PROTOCOL_CAPABILITY_MAVLINK2 https://mavlink.io/x\n")
+            self.assertEqual(szlinkgen.find_leftovers(root), [])
+
+    def test_refuses_to_replace_foreign_directory(self):
+        with tempfile.TemporaryDirectory() as root:
+            with open(os.path.join(root, "keep.txt"), "w") as f:
+                f.write("mine\n")
+            with self.assertRaises(szlinkgen.GenerateError):
+                szlinkgen.check_output_dir(root)
+            self.assertTrue(os.path.exists(os.path.join(root, "keep.txt")))
+
+    def test_accepts_missing_empty_or_generated_directory(self):
+        with tempfile.TemporaryDirectory() as root:
+            szlinkgen.check_output_dir(os.path.join(root, "missing"))
+            szlinkgen.check_output_dir(root)
+            open(os.path.join(root, szlinkgen.MARKER), "w").close()
+            open(os.path.join(root, "old.h"), "w").close()
+            szlinkgen.check_output_dir(root)
+
     def test_rename_tree_renames_paths_and_contents(self):
         with tempfile.TemporaryDirectory() as src, tempfile.TemporaryDirectory() as dst:
             os.makedirs(os.path.join(src, "spacezet"))

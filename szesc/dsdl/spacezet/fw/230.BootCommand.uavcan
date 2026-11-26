@@ -1,0 +1,35 @@
+#
+# SpaceZet ESC firmware update over DroneCAN: control.
+#
+# The flight controller sends BEGIN with the 80-byte signed image header,
+# then the image body with FirmwareChunk, then COMMIT. The ESC checks the
+# header (board, key, size, version) at BEGIN and the Ed25519 signature over
+# the whole image at COMMIT, before installing it. See szesc/README.md.
+#
+
+uint8 COMMAND_BEGIN  = 0
+uint8 COMMAND_COMMIT = 1
+uint8 COMMAND_ABORT  = 2
+uint8 COMMAND_STATUS = 3
+uint8 command
+
+uint8[<=80] header      # BEGIN only: the image header
+
+---
+
+uint8 STATUS_OK            = 0
+uint8 STATUS_BUSY          = 1   # motor armed or running
+uint8 STATUS_BAD_HEADER    = 2
+uint8 STATUS_WRONG_BOARD   = 3
+uint8 STATUS_UNKNOWN_KEY   = 4
+uint8 STATUS_TOO_LARGE     = 5
+uint8 STATUS_DOWNGRADE     = 6   # older than the installed firmware
+uint8 STATUS_NOT_STARTED   = 7
+uint8 STATUS_BAD_OFFSET    = 8   # chunk not at next_offset
+uint8 STATUS_INCOMPLETE    = 9   # COMMIT before the whole body arrived
+uint8 STATUS_BAD_SIGNATURE = 10
+uint8 STATUS_FLASH_ERROR   = 11
+uint8 status
+
+uint32 next_offset      # body bytes received so far
+uint32 body_size        # from the header, 0 when no update is in progress

@@ -99,7 +99,7 @@ jobs:
       - uses: actions/setup-python@v7
         with:
           python-version: '3.x'
-      - run: pip install -r pymavlink/requirements.txt
+      - run: pip install -r pymavlink/requirements.txt cryptography
       - name: Generate szlink headers and run tests
         run: ./scripts/test_szlink.sh
 

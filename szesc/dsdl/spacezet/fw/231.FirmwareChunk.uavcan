@@ -1,0 +1,13 @@
+#
+# SpaceZet ESC firmware update over DroneCAN: one piece of the image body.
+# offset must equal next_offset of the previous response; a repeated chunk
+# (offset + length == next_offset) is acknowledged again without writing.
+#
+
+uint32 offset
+uint8[<=192] data
+
+---
+
+uint8 status            # BootCommand.STATUS_*
+uint32 next_offset

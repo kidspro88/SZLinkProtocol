@@ -22,6 +22,7 @@ static int failures;
 typedef struct {
     uint8_t mem[4096];
     uint32_t erased;
+    int erases;
     int installs;
     uint32_t installed_version;
     int fail_write;
@@ -32,6 +33,7 @@ static int rf_erase(void *ctx, uint32_t size)
     ram_flash_t *f = (ram_flash_t *)ctx;
     memset(f->mem, 0xFF, size);
     f->erased = size;
+    f->erases++;
     return 0;
 }
 
@@ -125,6 +127,10 @@ static void test_update_ok(void)
     CHECK(szfw_boot_command(&u, SZFW_COMMAND_BEGIN, tv_image, SZFW_HEADER_LEN, 0, &next, &size) ==
           SZFW_STATUS_OK);
     CHECK(next == 0 && size == BODY_LEN);
+    /* a repeated BEGIN (first response lost) does not erase again */
+    CHECK(szfw_boot_command(&u, SZFW_COMMAND_BEGIN, tv_image, SZFW_HEADER_LEN, 0, &next, &size) ==
+          SZFW_STATUS_OK);
+    CHECK(next == 0 && size == BODY_LEN && f.erases == 1);
     /* first chunk, repeated chunk (lost response), wrong offset */
     CHECK(szfw_chunk(&u, 0, &tv_image[BODY_OFF], 192, &next) == SZFW_STATUS_OK && next == 192);
     CHECK(szfw_chunk(&u, 0, &tv_image[BODY_OFF], 192, &next) == SZFW_STATUS_OK && next == 192);
@@ -143,6 +149,9 @@ static void test_update_ok(void)
     CHECK(szfw_boot_command(&u, SZFW_COMMAND_COMMIT, NULL, 0, 0, &next, &size) == SZFW_STATUS_OK);
     CHECK(f.installs == 1 && f.installed_version == 0x00010200);
     CHECK(u.installed_version == 0x00010200);
+    /* a repeated COMMIT (first response lost) answers OK and installs nothing more */
+    CHECK(szfw_boot_command(&u, SZFW_COMMAND_COMMIT, NULL, 0, 0, &next, &size) == SZFW_STATUS_OK);
+    CHECK(f.installs == 1 && size == 0);
     /* the same image again is fine, an older one is not (see test_rejections) */
     CHECK(szfw_boot_command(&u, SZFW_COMMAND_BEGIN, tv_image, SZFW_HEADER_LEN, 0, &next, &size) ==
           SZFW_STATUS_OK);

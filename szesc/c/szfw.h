@@ -97,6 +97,7 @@ typedef struct {
 
     /* state */
     uint8_t active;
+    uint8_t committed;          /* the last COMMIT installed an image (a repeated COMMIT answers OK) */
     uint8_t header[SZFW_HEADER_LEN];
     szfw_header_t hdr;
     uint32_t next_offset;
@@ -203,6 +204,7 @@ uint8_t szfw_verify_image(const uint8_t *image, size_t len, const uint8_t (*keys
 void szfw_updater_reset(szfw_updater_t *u)
 {
     u->active = 0;
+    u->committed = 0;
     u->next_offset = 0;
     memset(u->header, 0, sizeof(u->header));
     memset(&u->hdr, 0, sizeof(u->hdr));
@@ -243,6 +245,11 @@ uint8_t szfw_boot_command(szfw_updater_t *u, uint8_t command, const uint8_t *hea
             st = SZFW_STATUS_BUSY;
             break;
         }
+        if (u->active && u->next_offset == 0u && header != NULL && header_len == SZFW_HEADER_LEN &&
+            memcmp(header, u->header, SZFW_HEADER_LEN) == 0) {
+            /* the response was lost and BEGIN repeated: the staging area is already erased */
+            break;
+        }
         szfw_updater_reset(u);
         st = szfw_parse_header(header, header_len, &hdr);
         if (st != SZFW_STATUS_OK) {
@@ -267,7 +274,8 @@ uint8_t szfw_boot_command(szfw_updater_t *u, uint8_t command, const uint8_t *hea
 
     case SZFW_COMMAND_COMMIT:
         if (!u->active) {
-            st = SZFW_STATUS_NOT_STARTED;
+            /* a repeated COMMIT whose first response was lost (install() returned) */
+            st = u->committed ? SZFW_STATUS_OK : SZFW_STATUS_NOT_STARTED;
         } else if (busy) {
             st = SZFW_STATUS_BUSY;
         } else if (u->next_offset != u->hdr.body_size) {
@@ -284,6 +292,7 @@ uint8_t szfw_boot_command(szfw_updater_t *u, uint8_t command, const uint8_t *hea
             }
             /* done, or a bad image that more chunks cannot fix: start again */
             szfw_updater_reset(u);
+            u->committed = (uint8_t)(st == SZFW_STATUS_OK);
         }
         break;
 

@@ -15,6 +15,7 @@ from __future__ import annotations
 
 import hashlib
 import hmac
+import os
 import struct
 
 from cryptography.hazmat.primitives import poly1305
@@ -44,8 +45,13 @@ __all__ = [
     "aead_open",
     "x25519",
     "x25519_public",
-    "keys_from_secret",
-    "keys_from_passphrase",
+    "identity_generate",
+    "identity_public",
+    "identity_sign",
+    "identity_verify",
+    "identity_to_x25519_private",
+    "identity_to_x25519_public",
+    "fingerprint",
     "HandshakeInitiator",
     "HandshakeResponder",
 ]
@@ -139,20 +145,142 @@ def x25519_public(private: bytes) -> bytes:
         Encoding.Raw, PublicFormat.Raw)
 
 
-def keys_from_secret(secret: bytes) -> tuple[bytes, bytes]:
-    """``(vehicle_private, ground_private)`` derived from a shared 32-byte secret.
+# --- Ed25519 identities ------------------------------------------------------
+#
+# Each end has an identity: a 32-byte seed and its EdDSA public key on
+# Ed25519 with BLAKE2b-512 as the hash (Monocypher's crypto_sign, the same
+# key type ArduPilot uses for signed firmware). The Noise static X25519 keys
+# are converted from the identities (Monocypher crypto_from_eddsa_*), so a
+# vehicle and its ground station are paired by exchanging identity public
+# keys.
 
-    The secret is the MAVLink 2 signing key, so a vehicle is paired with the
-    ground station that set up signing on it.
-    """
-    if len(secret) != 32:
-        raise ValueError("secret must be 32 bytes")
-    return hkdf_expand32(secret, b"SZL vehicle key"), hkdf_expand32(secret, b"SZL ground key")
+_P = 2**255 - 19
+_L = 2**252 + 27742317777372353535851937790883648493
+_D = -121665 * pow(121666, _P - 2, _P) % _P
+_I = pow(2, (_P - 1) // 4, _P)
 
 
-def keys_from_passphrase(passphrase: str) -> tuple[bytes, bytes]:
-    """Same as MAVProxy ``signing setup <passphrase>``: secret = SHA-256(passphrase)."""
-    return keys_from_secret(hashlib.sha256(passphrase.encode()).digest())
+def _recover_x(y: int, sign: int) -> int:
+    xx = (y * y - 1) * pow(_D * y * y + 1, _P - 2, _P) % _P
+    x = pow(xx, (_P + 3) // 8, _P)
+    if (x * x - xx) % _P:
+        x = x * _I % _P
+    if (x * x - xx) % _P:
+        raise AuthError("not a curve point")
+    if x & 1 != sign:
+        x = _P - x
+    return x
+
+
+_BY = 4 * pow(5, _P - 2, _P) % _P
+_B = (_recover_x(_BY, 0), _BY, 1, _recover_x(_BY, 0) * _BY % _P)
+
+
+def _pt_add(a, b):
+    x1, y1, z1, t1 = a
+    x2, y2, z2, t2 = b
+    aa = (y1 - x1) * (y2 - x2) % _P
+    bb = (y1 + x1) * (y2 + x2) % _P
+    cc = 2 * t1 * t2 * _D % _P
+    dd = 2 * z1 * z2 % _P
+    e, f, g, h = bb - aa, dd - cc, dd + cc, bb + aa
+    return (e * f % _P, g * h % _P, f * g % _P, e * h % _P)
+
+
+def _pt_mul(k: int, pt):
+    acc = (0, 1, 1, 0)
+    while k:
+        if k & 1:
+            acc = _pt_add(acc, pt)
+        pt = _pt_add(pt, pt)
+        k >>= 1
+    return acc
+
+
+def _pt_encode(pt) -> bytes:
+    x, y, z, _ = pt
+    zi = pow(z, _P - 2, _P)
+    x, y = x * zi % _P, y * zi % _P
+    return (y | ((x & 1) << 255)).to_bytes(32, "little")
+
+
+def _pt_decode(b: bytes):
+    v = int.from_bytes(b, "little")
+    y = v & ((1 << 255) - 1)
+    if y >= _P:
+        raise AuthError("bad point")
+    x = _recover_x(y, v >> 255)
+    return (x, y, 1, x * y % _P)
+
+
+def _expand_seed(seed: bytes) -> tuple[int, bytes]:
+    h = hashlib.blake2b(seed, digest_size=64).digest()
+    a = bytearray(h[:32])
+    a[0] &= 248
+    a[31] &= 127
+    a[31] |= 64
+    return int.from_bytes(a, "little"), h[32:]
+
+
+def identity_generate() -> bytes:
+    """A new random identity seed (keep it secret)."""
+    return os.urandom(32)
+
+
+def identity_public(seed: bytes) -> bytes:
+    """EdDSA (Ed25519 + BLAKE2b) public key of an identity seed."""
+    if len(seed) != 32:
+        raise ValueError("seed must be 32 bytes")
+    return _pt_encode(_pt_mul(_expand_seed(seed)[0], _B))
+
+
+def identity_sign(seed: bytes, message: bytes) -> bytes:
+    """64-byte EdDSA signature, identical to Monocypher crypto_sign."""
+    a, prefix = _expand_seed(seed)
+    pub = _pt_encode(_pt_mul(a, _B))
+    r = int.from_bytes(hashlib.blake2b(prefix + message, digest_size=64).digest(), "little") % _L
+    rr = _pt_encode(_pt_mul(r, _B))
+    h = int.from_bytes(hashlib.blake2b(rr + pub + message, digest_size=64).digest(), "little") % _L
+    return rr + ((r + h * a) % _L).to_bytes(32, "little")
+
+
+def identity_verify(public: bytes, message: bytes, signature: bytes) -> bool:
+    """Check an EdDSA signature (same rules as Monocypher crypto_check)."""
+    if len(signature) != 64 or len(public) != 32:
+        return False
+    s = int.from_bytes(signature[32:], "little")
+    if s >= _L:
+        return False
+    try:
+        a = _pt_decode(public)
+    except AuthError:
+        return False
+    h = int.from_bytes(hashlib.blake2b(signature[:32] + public + message,
+                                       digest_size=64).digest(), "little") % _L
+    # R' = s*B - h*A
+    neg_a = ((_P - a[0]) % _P, a[1], a[2], (_P - a[3]) % _P)
+    check = _pt_add(_pt_mul(s, _B), _pt_mul(h, neg_a))
+    return _pt_encode(check) == bytes(signature[:32])
+
+
+def identity_to_x25519_private(seed: bytes) -> bytes:
+    """Static X25519 private key of an identity (crypto_from_eddsa_private)."""
+    return hashlib.blake2b(seed, digest_size=64).digest()[:32]
+
+
+def identity_to_x25519_public(public: bytes) -> bytes:
+    """Static X25519 public key of an identity public key (crypto_from_eddsa_public)."""
+    if len(public) != 32:
+        raise ValueError("public key must be 32 bytes")
+    y = int.from_bytes(public, "little") & ((1 << 255) - 1)
+    u = (1 + y) * pow((1 - y) % _P, _P - 2, _P) % _P
+    return u.to_bytes(32, "little")
+
+
+def fingerprint(public: bytes) -> str:
+    """Short form of an identity public key for people to compare."""
+    h = hashlib.blake2b(public, digest_size=8).hexdigest().upper()
+    return "-".join(h[i:i + 4] for i in range(0, 16, 4))
 
 
 def x25519_generate() -> bytes:

@@ -94,14 +94,43 @@ static void test_vectors_handshake(void)
     CHECK(gcs.cur.valid && veh.pending.valid && !veh.cur.valid);
 }
 
-static void test_keys_from_secret(void)
+static void test_identity(void)
 {
-    uint8_t v[32], g[32], pub[32];
-    szlink_sec_keys_from_secret(tv_secret, v, g);
-    szlink_sec_public_key(pub, v);
-    CHECK(memcmp(pub, tv_secret_vehicle_pub, 32) == 0);
-    szlink_sec_public_key(pub, g);
-    CHECK(memcmp(pub, tv_secret_ground_pub, 32) == 0);
+    uint8_t pub[32], other_seed[32], other_pub[32], sig[64];
+    szlink_sec_t a, b;
+    szlink_sec_identity_public(pub, tv_id_seed);
+    CHECK(memcmp(pub, tv_id_pub, 32) == 0);
+    /* Python's EdDSA-BLAKE2b signature matches Monocypher */
+    crypto_sign(sig, tv_id_seed, pub, (const uint8_t *)"SZ-Link", 7);
+    CHECK(memcmp(sig, tv_id_sig, 64) == 0);
+    /* static X25519 key converted from the identity, both ends agree */
+    memset(other_seed, 0x5a, sizeof(other_seed));
+    szlink_sec_identity_public(other_pub, other_seed);
+    CHECK(szlink_sec_init_identity(&a, SZLINK_SEC_RESPONDER, tv_id_seed, other_pub) == 0);
+    CHECK(szlink_sec_init_identity(&b, SZLINK_SEC_INITIATOR, other_seed, tv_id_pub) == 0);
+    CHECK(memcmp(b.peer_pub, tv_id_x25519_pub, 32) == 0);
+    CHECK(memcmp(a.s_pub, b.peer_pub, 32) == 0 && memcmp(b.s_pub, a.peer_pub, 32) == 0);
+    CHECK(memcmp(a.ss, b.ss, 32) == 0);
+    /* an all-zero peer key (unpaired) is refused */
+    memset(other_pub, 0, sizeof(other_pub));
+    CHECK(szlink_sec_init_identity(&a, SZLINK_SEC_RESPONDER, tv_id_seed, other_pub) != 0);
+}
+
+static void test_pairing(void)
+{
+    uint8_t gcs_pub[32], veh_pub[32], sig[64], bad[64];
+    szlink_sec_identity_public(gcs_pub, tv_id_seed);
+    CHECK(memcmp(tv_pair_req + 2, gcs_pub, 32) == 0);
+    CHECK(szlink_sec_pair_request_valid(tv_pair_req + 2, tv_pair_req + 34));
+    memcpy(bad, tv_pair_req + 34, 64);
+    bad[5] ^= 1u;
+    CHECK(!szlink_sec_pair_request_valid(tv_pair_req + 2, bad));
+    /* the vehicle's response is byte-identical to Python's */
+    szlink_sec_identity_public(veh_pub, tv_veh_id_seed);
+    szlink_sec_pair_response_sign(sig, tv_veh_id_seed, veh_pub, gcs_pub);
+    CHECK(tv_pair_resp[2] == 0u);
+    CHECK(memcmp(tv_pair_resp + 3, veh_pub, 32) == 0);
+    CHECK(memcmp(tv_pair_resp + 35, sig, 64) == 0);
 }
 
 static void test_vectors_frames(void)
@@ -347,7 +376,8 @@ static void test_fec_frames(void)
 int main(void)
 {
     test_rfc8439_aead();
-    test_keys_from_secret();
+    test_identity();
+    test_pairing();
     test_vectors_handshake();
     test_vectors_frames();
     test_tamper_replay_and_strangers();

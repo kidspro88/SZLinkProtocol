@@ -42,6 +42,24 @@ Documentation:
         <description>Payload is sent in clear but authenticated (signed) with a tag.</description>
       </entry>
     </enum>
+    <enum name="SZ_PAIR_RESULT">
+      <description>Result of an SZ_PAIR_REQUEST.</description>
+      <entry value="0" name="SZ_PAIR_RESULT_ACCEPTED">
+        <description>The ground station is now the paired one; public_key is the vehicle's identity.</description>
+      </entry>
+      <entry value="1" name="SZ_PAIR_RESULT_NOT_PAIRING">
+        <description>The port is not in pairing mode (set it on the vehicle first).</description>
+      </entry>
+      <entry value="2" name="SZ_PAIR_RESULT_ARMED">
+        <description>The vehicle is armed.</description>
+      </entry>
+      <entry value="3" name="SZ_PAIR_RESULT_BAD_SIGNATURE">
+        <description>The request's signature does not match its public key.</description>
+      </entry>
+      <entry value="4" name="SZ_PAIR_RESULT_FAILED">
+        <description>The vehicle could not store the keys.</description>
+      </entry>
+    </enum>
     <enum name="SZ_VIDEO_CODEC">
       <description>Video codec of the stream carried in SZ_VIDEO_PKT.</description>
       <entry value="0" name="SZ_VIDEO_CODEC_H264">
@@ -95,6 +113,21 @@ Documentation:
       <field type="uint8_t" name="target_system">System ID.</field>
       <field type="uint8_t" name="target_component">Component ID.</field>
       <field type="uint8_t[48]" name="handshake">Noise handshake message: ephemeral key (32), authentication tag (16).</field>
+    </message>
+    <message id="54004" name="SZ_PAIR_REQUEST">
+      <description>Pair a ground station with a vehicle. Sent by the ground station on SZ_LCID_TELEMETRY, unprotected. The vehicle accepts it only while disarmed and while the port is in pairing mode, stores public_key as its only ground station and answers with SZ_PAIR_RESPONSE. Identities are Ed25519 keys with EdDSA over BLAKE2b (Monocypher crypto_sign); the SZ_KEX_INIT/SZ_KEX_RESP static keys are converted from them. Compare the fingerprints shown on both sides to rule out a man-in-the-middle during pairing.</description>
+      <field type="uint8_t" name="target_system">System ID.</field>
+      <field type="uint8_t" name="target_component">Component ID.</field>
+      <field type="uint8_t[32]" name="public_key">Identity public key of the ground station.</field>
+      <field type="uint8_t[64]" name="signature">Signature by that key of "SZL pair req" || public_key.</field>
+    </message>
+    <message id="54005" name="SZ_PAIR_RESPONSE">
+      <description>Answer to SZ_PAIR_REQUEST. Sent by the vehicle on SZ_LCID_TELEMETRY, unprotected.</description>
+      <field type="uint8_t" name="target_system">System ID.</field>
+      <field type="uint8_t" name="target_component">Component ID.</field>
+      <field type="uint8_t" name="result" enum="SZ_PAIR_RESULT">Result.</field>
+      <field type="uint8_t[32]" name="public_key">Identity public key of the vehicle (all zero unless accepted).</field>
+      <field type="uint8_t[64]" name="signature">When accepted, signature by the vehicle key of "SZL pair resp" || vehicle public_key || ground station public_key; otherwise all zero.</field>
     </message>
   </messages>
 </mavlink>

@@ -6,6 +6,8 @@
  * Byte-for-byte compatible with szlink/python/szlink/{crypto,session}.py.
  * The protocol is described in szlink/README.md ("Security").
  *
+ * - Identities: Ed25519 (EdDSA-BLAKE2b) key pairs, paired by exchanging
+ *   public keys; the static X25519 keys are converted from them.
  * - Handshake: Noise_IK_25519_ChaChaPoly_BLAKE2b, prologue "SZ-Link v1".
  *   The ground station is the initiator and knows the vehicle's static
  *   X25519 public key; the vehicle accepts only its paired ground station.
@@ -21,7 +23,8 @@
  *   payload for signed-only frames. Tag is 8 bytes on LCID RC, else 16.
  *
  * Depends on Monocypher 3.1.x (crypto_x25519, crypto_blake2b_*,
- * crypto_ietf_chacha20_ctr, crypto_poly1305_*). No dynamic allocation, no
+ * crypto_ietf_chacha20_ctr, crypto_poly1305_*, crypto_sign_public_key,
+ * crypto_from_eddsa_*). No dynamic allocation, no
  * clock and no RNG: the caller passes a monotonic millisecond time and
  * random ephemeral keys.
  *
@@ -150,16 +153,33 @@ void szlink_sec_init(szlink_sec_t *s, uint8_t role, const uint8_t s_priv[32],
 void szlink_sec_wipe(szlink_sec_t *s);
 
 /**
- * Derive both static private keys from one 32-byte shared secret (the
- * MAVLink 2 signing key: SHA-256 of the passphrase given to
- * `signing setup` in MAVProxy, or set with SETUP_SIGNING). Lets a vehicle
- * and its ground station be paired with the key they already share.
+ * Identities. Each end has a 32-byte secret seed and an Ed25519 public key
+ * (EdDSA with BLAKE2b, Monocypher crypto_sign: the key type of ArduPilot
+ * signed firmware). The Noise static X25519 keys are converted from them,
+ * so pairing is exchanging identity public keys (SZ_PAIR_REQUEST/RESPONSE).
  */
-void szlink_sec_keys_from_secret(const uint8_t secret[32], uint8_t vehicle_priv[32],
-                                 uint8_t ground_priv[32]);
+/** Identity public key of a seed. */
+void szlink_sec_identity_public(uint8_t id_pub[32], const uint8_t seed[32]);
+/** Set up one end from its identity seed and the paired peer's identity
+ *  public key. Returns 0, or -1 if peer_id_pub is not a usable key. */
+int szlink_sec_init_identity(szlink_sec_t *s, uint8_t role, const uint8_t seed[32],
+                             const uint8_t peer_id_pub[32]);
 
 /** Static public key of a private key. */
 void szlink_sec_public_key(uint8_t pub[32], const uint8_t priv[32]);
+
+/**
+ * Pairing (SZ_PAIR_REQUEST / SZ_PAIR_RESPONSE). The request carries the
+ * ground station key and its signature of "SZL pair req" || key; the
+ * accepted response carries the vehicle key and its signature of
+ * "SZL pair resp" || vehicle key || ground station key.
+ */
+/** 1 if a pairing request's signature is valid. */
+int szlink_sec_pair_request_valid(const uint8_t gcs_id_pub[32], const uint8_t sig[64]);
+/** Vehicle: sign an accepted pairing response. */
+void szlink_sec_pair_response_sign(uint8_t sig[64], const uint8_t seed[32],
+                                   const uint8_t vehicle_id_pub[32],
+                                   const uint8_t gcs_id_pub[32]);
 
 /** Authentication tag length on a logical channel: 8 (RC) or 16. */
 uint8_t szlink_sec_tag_len(uint8_t lcid);
@@ -340,11 +360,9 @@ static int szlink_sec_dh_(uint8_t out[32], const uint8_t priv[32], const uint8_t
     return d != 0; /* reject low-order points */
 }
 
-void szlink_sec_keys_from_secret(const uint8_t secret[32], uint8_t vehicle_priv[32],
-                                 uint8_t ground_priv[32])
+void szlink_sec_identity_public(uint8_t id_pub[32], const uint8_t seed[32])
 {
-    szlink_sec_expand32_(vehicle_priv, secret, "SZL vehicle key", NULL, 0);
-    szlink_sec_expand32_(ground_priv, secret, "SZL ground key", NULL, 0);
+    crypto_sign_public_key(id_pub, seed);
 }
 
 void szlink_sec_public_key(uint8_t pub[32], const uint8_t priv[32])
@@ -468,6 +486,37 @@ void szlink_sec_init(szlink_sec_t *s, uint8_t role, const uint8_t s_priv[32],
     memcpy(s->peer_pub, peer_pub, 32u);
     crypto_x25519_public_key(s->s_pub, s_priv);
     s->ss_ok = (uint8_t)szlink_sec_dh_(s->ss, s->s_priv, s->peer_pub);
+}
+
+int szlink_sec_pair_request_valid(const uint8_t gcs_id_pub[32], const uint8_t sig[64])
+{
+    uint8_t msg[12 + 32];
+    memcpy(msg, "SZL pair req", 12u);
+    memcpy(msg + 12, gcs_id_pub, 32u);
+    return crypto_check(sig, gcs_id_pub, msg, sizeof(msg)) == 0;
+}
+
+void szlink_sec_pair_response_sign(uint8_t sig[64], const uint8_t seed[32],
+                                   const uint8_t vehicle_id_pub[32],
+                                   const uint8_t gcs_id_pub[32])
+{
+    uint8_t msg[13 + 64];
+    memcpy(msg, "SZL pair resp", 13u);
+    memcpy(msg + 13, vehicle_id_pub, 32u);
+    memcpy(msg + 45, gcs_id_pub, 32u);
+    crypto_sign(sig, seed, vehicle_id_pub, msg, sizeof(msg));
+}
+
+int szlink_sec_init_identity(szlink_sec_t *s, uint8_t role, const uint8_t seed[32],
+                             const uint8_t peer_id_pub[32])
+{
+    uint8_t x_priv[32];
+    uint8_t x_pub[32];
+    crypto_from_eddsa_private(x_priv, seed);
+    crypto_from_eddsa_public(x_pub, peer_id_pub);
+    szlink_sec_init(s, role, x_priv, x_pub);
+    crypto_wipe(x_priv, sizeof(x_priv));
+    return s->ss_ok ? 0 : -1;
 }
 
 void szlink_sec_wipe(szlink_sec_t *s)

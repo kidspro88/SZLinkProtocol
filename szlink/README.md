@@ -29,6 +29,7 @@ and the MAVLink signature is dropped: authentication is done by the SEC layer.
 - `SZ_RC_CMD` (54000): roll, pitch, yaw (int16, ±10000) and throttle (uint16, 0–10000). LCID RC, 50–150 Hz.
 - `SZ_VIDEO_PKT` (54001): H.264/H.265 NAL unit fragment, up to 248 bytes. LCID Video.
 - `SZ_KEX_INIT` (54002) / `SZ_KEX_RESP` (54003): key exchange (see Security). LCID Telemetry, always unprotected.
+- `SZ_PAIR_REQUEST` (54004) / `SZ_PAIR_RESPONSE` (54005): pairing of Ed25519 identities (see Security). LCID Telemetry, unprotected.
 - Telemetry uses the standard MAVLink messages from `common.xml` (HEARTBEAT, GPS_RAW_INT, ...).
 
 ## C library
@@ -74,13 +75,23 @@ if (szlink_frame_parse_char(&parser, c, &msg, &lcid, &sec)) {
 | 3 (`0x08`) | frame is inside a Reed-Solomon FEC envelope |
 | 4 (`0x10`) | signed: payload in clear, authenticated with the same AEAD |
 
-**Pairing.** The ground station (initiator) and the vehicle (responder) each have
-a static X25519 key pair. The ground station knows the vehicle's public key and
-the vehicle accepts only its paired ground station. The keys can be any X25519
-keys; the ArduPilot port derives both from the MAVLink 2 signing key the
-vehicle and ground station already share (`szlink_sec_keys_from_secret`,
-`crypto.keys_from_passphrase` = SHA-256 of the MAVProxy `signing setup`
-passphrase), so pairing is the existing signing setup over USB.
+**Cipher choice.** All protected frames use an AEAD (ChaCha20-Poly1305), not
+AES-CTR: without a tag an attacker can flip bits of an RC command undetected.
+ChaCha20 is fast in software on MCUs without an AES unit.
+
+**Identities and pairing.** The ground station and the vehicle each have an
+Ed25519 identity: a secret 32-byte seed and its public key, EdDSA with
+BLAKE2b (Monocypher `crypto_sign`, the key type ArduPilot uses for signed
+firmware). The Noise static X25519 keys are converted from the identities
+(`crypto_from_eddsa_*`). Pairing exchanges the identity public keys over the
+link while the vehicle is disarmed and its port is in pairing mode:
+`SZ_PAIR_REQUEST` carries the ground station key, signed by it;
+`SZ_PAIR_RESPONSE` carries the vehicle key, signed over both keys. After that
+the vehicle answers only the paired ground station, and the ground station
+only accepts the paired vehicle (Noise IK authenticates both static keys), so
+a man-in-the-middle cannot take over the link. Pairing itself trusts the first
+key it sees: compare the fingerprints (`crypto.fingerprint`) shown on both
+sides, or pair over a cable.
 
 **Handshake.** `Noise_IK_25519_ChaChaPoly_BLAKE2b`, prologue `SZ-Link v1`. The
 ground station sends `SZ_KEX_INIT` (104 bytes: `-> e, es, s, ss` plus an 8-byte
@@ -129,7 +140,7 @@ must use the same `nsym` (2-32, even).
 #include "szlink_frame.h"
 
 szlink_sec_t sec;
-szlink_sec_init(&sec, SZLINK_SEC_RESPONDER, my_private_key, peer_public_key);
+szlink_sec_init_identity(&sec, SZLINK_SEC_RESPONDER, my_identity_seed, paired_gcs_identity);
 /* on SZ_KEX_INIT: szlink_sec_handle_kex_init(&sec, init, random_32_bytes, now_ms, resp) */
 n = szlink_frame_serialize_secure(buf, &msg, SZ_LCID_RC, SZLINK_SEC_ENCRYPTED, 0, &sec, now_ms);
 
@@ -148,10 +159,14 @@ bytes for each ephemeral key.
 `szlink/python/szlink` (needs `cryptography`):
 
 ```python
-from szlink import FrameCodec, SecureLink
+from szlink import FrameCodec, SecureLink, pairing
 from szlink.session import INITIATOR, SEC_ENCRYPTED
 
-link = SecureLink(INITIATOR, gcs_private_key, vehicle_public_key)
+me = pairing.Identity.load("gcs.key")       # tools/szlink_identity.py new gcs.key
+# once, vehicle disarmed and in pairing mode:
+send(FrameCodec(msg_info).encode(54004, pairing.pair_request(me, 1, 1), 255, 190, 1))
+#   ... SZ_PAIR_RESPONSE -> pairing.parse_pair_response(payload, me.public)
+link = SecureLink.from_identity(INITIATOR, me.seed, vehicle_identity)
 codec = FrameCodec(msg_info, link, fec_nsym=16)   # msg_info(msgid) -> (crc_extra, max_len)
 if link.needs_kex(now_ms):
     send(codec.encode(54002, bytes([1, 1]) + link.kex_init(now_ms), 255, 190, 1))

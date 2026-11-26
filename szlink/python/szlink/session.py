@@ -238,6 +238,13 @@ class SecureLink:
         self._last_rx_ms: int | None = None
         self.stats = {"auth_fail": 0, "rekeys": 0, "kex_replay": 0}
 
+    @classmethod
+    def from_identity(cls, role: str, identity_seed: bytes, peer_identity: bytes) -> "SecureLink":
+        """Set up from this end's Ed25519 identity seed and the paired peer's
+        identity public key (see ``crypto.identity_*``)."""
+        return cls(role, crypto.identity_to_x25519_private(identity_seed),
+                   crypto.identity_to_x25519_public(peer_identity))
+
     # --- handshake ------------------------------------------------------------
 
     def needs_kex(self, now_ms: int) -> bool:

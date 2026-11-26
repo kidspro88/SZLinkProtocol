@@ -33,6 +33,9 @@ STX = 0xFD
 HEADER_LEN = 9
 LCID_RC, LCID_TELEMETRY, LCID_VIDEO = 0, 1, 2
 FEC_MAX_NSYM = 32
+# largest frame (255-byte payload, 16-byte tag) and its FEC envelope, as in szlink_frame.h
+FRAME_MAX_LEN = HEADER_LEN + 3 + 255 + 16
+FEC_MAX_LEN = ecc.HEADER_LEN + FRAME_MAX_LEN + 2 * FEC_MAX_NSYM
 
 MsgInfo = Callable[[int], Optional[tuple[int, int]]]  # msgid -> (crc_extra, max_len)
 
@@ -145,6 +148,8 @@ class FrameCodec:
         except ecc.ECCError:
             return 0, None
         total = self.fec.encoded_length(length)
+        if total > FEC_MAX_LEN:
+            return 0, None  # the header RS code is unkeyed: do not wait for a forged length
         if len(self._buf) < total:
             return 1, None
         try:

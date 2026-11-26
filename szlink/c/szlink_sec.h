@@ -531,9 +531,13 @@ uint8_t szlink_sec_tag_len(uint8_t lcid)
 
 static void szlink_sec_retire_current_(szlink_sec_t *s, uint32_t now_ms)
 {
+    crypto_wipe(&s->prev, sizeof(s->prev));
     if (s->cur.valid) {
         s->prev = s->cur;
         s->prev_until_ms = now_ms + SZLINK_SEC_PREV_GRACE_MS;
+        /* prev only receives: drop the transmit chain now */
+        crypto_wipe(s->prev.tx_chain, sizeof(s->prev.tx_chain));
+        crypto_wipe(s->prev.tx_keys, sizeof(s->prev.tx_keys));
     }
     crypto_wipe(&s->cur, sizeof(s->cur));
 }
@@ -901,9 +905,13 @@ int szlink_sec_open(szlink_sec_t *s, const uint8_t hdr[SZLINK_SEC_HEADER_LEN], u
         tag_len != szlink_sec_tag_len(hdr[2])) {
         return SZLINK_SEC_ERR_PARAM;
     }
+    if (s->prev.valid && (int32_t)(now_ms - s->prev_until_ms) >= 0) {
+        /* grace period over: forget the old session's keys */
+        crypto_wipe(&s->prev, sizeof(s->prev));
+    }
     order[0] = &s->cur;
     order[1] = &s->pending;
-    order[2] = (int32_t)(now_ms - s->prev_until_ms) < 0 ? &s->prev : NULL;
+    order[2] = s->prev.valid ? &s->prev : NULL;
     for (i = 0; i < 3; i++) {
         szlink_sec_session_t *ss = order[i];
         uint32_t epoch;

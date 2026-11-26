@@ -108,6 +108,15 @@ class FrameTest(unittest.TestCase):
         fec_tx = FrameCodec(MSGS.get, fec_nsym=8)
         self.assertEqual(plain.parse(fec_tx.encode(54001, b"\x01", 1, 1, LCID_VIDEO)), [])
 
+    def test_forged_envelope_length_does_not_stall(self):
+        from szlink import ecc
+        gcs, veh = codecs(fec=8)
+        # a valid header RS codeword claiming a 65535-byte envelope
+        forged = ecc.RSCodec(ecc.HEADER_NSYM).encode(bytes([ecc.MAGIC, 0xFF, 0xFF]))
+        frame = gcs.encode(54000, RC, 1, 1, LCID_RC, mode=SEC_ENCRYPTED)
+        (got,) = veh.parse(forged + frame)
+        self.assertEqual(got.payload, RC)
+
     def test_stream_resync_mixed(self):
         rng = random.Random(4)
         gcs, veh = codecs(fec=8)

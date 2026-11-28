@@ -3,17 +3,17 @@
 <xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
 
 <xsl:template match="//include">
-   <h1>MAVLink Include Files</h1>
+   <h1>SZLink Include Files</h1>
    <p><strong><em>Including files: </em><xsl:value-of select="." /></strong></p>
 </xsl:template>
 
 <xsl:template match="//enums">
-   <h1>MAVLink Type Enumerations</h1>
+   <h1>SZLink Type Enumerations</h1>
    <xsl:apply-templates />
 </xsl:template>
 
 <xsl:template match="//messages">
-   <h1>MAVLink Messages</h1>
+   <h1>SZLink Messages</h1>
    <xsl:apply-templates />
 </xsl:template>
 
@@ -23,7 +23,7 @@
       <xsl:value-of select="@name"/>
     </xsl:attribute>
   </a>
-  <h3 class="mavlink_message_name"><xsl:value-of select="@name" /> (
+  <h3 class="szlink_message_name"><xsl:value-of select="@name" /> (
    <a>
     <xsl:attribute name="href">
       #<xsl:value-of select="@name"/>
@@ -35,9 +35,9 @@
    <table class="sortable">
    <thead>
    <tr>
-     <th class="mavlink_field_header">Field Name</th>
-     <th class="mavlink_field_header">Type</th>
-     <th class="mavlink_field_header">Description</th>
+     <th class="szlink_field_header">Field Name</th>
+     <th class="szlink_field_header">Type</th>
+     <th class="szlink_field_header">Description</th>
    </tr>
    </thead>
    <tbody>
@@ -47,17 +47,17 @@
 </xsl:template>
 
 <xsl:template match="//field">
-   <tr class="mavlink_field">
-   <td class="mavlink_name" valign="top"><xsl:value-of select="@name" /></td>
-   <td class="mavlink_type" valign="top"><xsl:value-of select="@type" /></td>
-   <td class="mavlink_comment"><xsl:value-of select="." /></td>
+   <tr class="szlink_field">
+   <td class="szlink_name" valign="top"><xsl:value-of select="@name" /></td>
+   <td class="szlink_type" valign="top"><xsl:value-of select="@type" /></td>
+   <td class="szlink_comment"><xsl:value-of select="." /></td>
    </tr>
 </xsl:template>
 
 <xsl:template match="//version">
-   <h2 style="color:red;">MAVLink Documentation</h2>
+   <h2 style="color:red;">SZLink Documentation</h2>
    <p>
-   The <a href="https://mavlink.io/en/messages/common.html">Official MAVLink message documentation</a> contains additional information, including field units and enum values.
+   The <a href="https://mavlink.io/en/messages/common.html">Upstream MAVLink message documentation</a> contains additional information, including field units and enum values.
    </p>
 
    <h2>MAVLink Protocol Version</h2>
@@ -70,15 +70,15 @@
       ENUM_<xsl:value-of select="@name"/>
     </xsl:attribute>
   </a>
-   <h3 class="mavlink_message_name"><xsl:value-of select="@name" /></h3>
+   <h3 class="szlink_message_name"><xsl:value-of select="@name" /></h3>
 
    <p class="description"><xsl:value-of select="description" /></p>
    <table class="sortable">
    <thead>
    <tr>
-     <th class="mavlink_field_header">Value</th>
-     <th class="mavlink_field_header">Field Name</th>
-     <th class="mavlink_field_header">Description</th>
+     <th class="szlink_field_header">Value</th>
+     <th class="szlink_field_header">Field Name</th>
+     <th class="szlink_field_header">Description</th>
    </tr>
    </thead>
    <tbody>
@@ -88,10 +88,10 @@
 </xsl:template>
 
 <xsl:template match="//entry">
-   <tr class="mavlink_field" id="{@name}">
-   <td class="mavlink_type" valign="top"><xsl:value-of select="@value" /></td>
-   <td class="mavlink_name" valign="top"><xsl:value-of select="@name" /></td>
-   <td class="mavlink_comment"><xsl:value-of select="description" /></td>
+   <tr class="szlink_field" id="{@name}">
+   <td class="szlink_type" valign="top"><xsl:value-of select="@value" /></td>
+   <td class="szlink_name" valign="top"><xsl:value-of select="@name" /></td>
+   <td class="szlink_comment"><xsl:value-of select="description" /></td>
    </tr>
    <tr>
      <td></td>
@@ -105,8 +105,8 @@
 <xsl:template match="//param">
    <tr>
    <td></td>
-   <td class="mavlink_mission_param" valign="top">Mission Param #<xsl:value-of select="@index" /></td>
-   <td class="mavlink_comment"><xsl:value-of select="." /></td>
+   <td class="szlink_mission_param" valign="top">Mission Param #<xsl:value-of select="@index" /></td>
+   <td class="szlink_comment"><xsl:value-of select="." /></td>
    </tr>
 </xsl:template>
 

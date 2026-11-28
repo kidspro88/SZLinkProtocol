@@ -1,0 +1,3 @@
+get_filename_component(SZLINK_CMAKE_DIR "${CMAKE_CURRENT_LIST_FILE}" PATH)
+include("${SZLINK_CMAKE_DIR}/SZLinkTargets.cmake")
+

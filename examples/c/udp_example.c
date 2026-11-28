@@ -1,5 +1,5 @@
-// Simple example receiving and sending MAVLink v2 over UDP
-// based on POSIX APIs (e.g. Linux, BSD, macOS).
+// Simple example receiving and sending SZLink messages (MAVLink v2 wire
+// format) over UDP based on POSIX APIs (e.g. Linux, BSD, macOS).
 
 #include <errno.h>
 #include <stdio.h>
@@ -13,11 +13,11 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include <mavlink/common/mavlink.h>
+#include <szlink/common/szlink.h>
 
 
 void receive_some(int socket_fd, struct sockaddr_in* src_addr, socklen_t* src_addr_len, bool* src_addr_set);
-void handle_heartbeat(const mavlink_message_t* message);
+void handle_heartbeat(const szlink_message_t* message);
 
 void send_some(int socket_fd, const struct sockaddr_in* src_addr, socklen_t src_addr_len);
 void send_heartbeat(int socket_fd, const struct sockaddr_in* src_addr, socklen_t src_addr_len);
@@ -94,17 +94,17 @@ void receive_some(int socket_fd, struct sockaddr_in* src_addr, socklen_t* src_ad
 
     *src_addr_set = true;
 
-    mavlink_message_t message;
-    mavlink_status_t status;
+    szlink_message_t message;
+    szlink_status_t status;
     for (int i = 0; i < ret; ++i) {
-        if (mavlink_parse_char(MAVLINK_COMM_0, buffer[i], &message, &status) == 1) {
+        if (szlink_parse_char(SZLINK_COMM_0, buffer[i], &message, &status) == 1) {
 
             // printf(
             //     "Received message %d from %d/%d\n",
             //     message.msgid, message.sysid, message.compid);
 
             switch (message.msgid) {
-            case MAVLINK_MSG_ID_HEARTBEAT:
+            case SZLINK_MSG_ID_HEARTBEAT:
                 handle_heartbeat(&message);
                 break;
             }
@@ -112,10 +112,10 @@ void receive_some(int socket_fd, struct sockaddr_in* src_addr, socklen_t* src_ad
     }
 }
 
-void handle_heartbeat(const mavlink_message_t* message)
+void handle_heartbeat(const szlink_message_t* message)
 {
-    mavlink_heartbeat_t heartbeat;
-    mavlink_msg_heartbeat_decode(message, &heartbeat);
+    szlink_heartbeat_t heartbeat;
+    szlink_msg_heartbeat_decode(message, &heartbeat);
 
     printf("Got heartbeat from ");
     switch (heartbeat.autopilot) {
@@ -148,15 +148,15 @@ void send_some(int socket_fd, const struct sockaddr_in* src_addr, socklen_t src_
 
 void send_heartbeat(int socket_fd, const struct sockaddr_in* src_addr, socklen_t src_addr_len)
 {
-    mavlink_message_t message;
+    szlink_message_t message;
 
     const uint8_t system_id = 42;
     const uint8_t base_mode = 0;
     const uint8_t custom_mode = 0;
-    mavlink_msg_heartbeat_pack_chan(
+    szlink_msg_heartbeat_pack_chan(
         system_id,
         MAV_COMP_ID_PERIPHERAL,
-        MAVLINK_COMM_0,
+        SZLINK_COMM_0,
         &message,
         MAV_TYPE_GENERIC,
         MAV_AUTOPILOT_GENERIC,
@@ -164,8 +164,8 @@ void send_heartbeat(int socket_fd, const struct sockaddr_in* src_addr, socklen_t
         custom_mode,
         MAV_STATE_STANDBY);
 
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
-    const int len = mavlink_msg_to_send_buffer(buffer, &message);
+    uint8_t buffer[SZLINK_MAX_PACKET_LEN];
+    const int len = szlink_msg_to_send_buffer(buffer, &message);
 
     int ret = sendto(socket_fd, buffer, len, 0, (const struct sockaddr*)src_addr, src_addr_len);
     if (ret != len) {

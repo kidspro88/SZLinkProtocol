@@ -1,3 +1,3 @@
-# Contributing to MAVLink
+# Contributing to SZLink
 
-See [Contributing](https://mavlink.io/en/contributing/contributing.html) (MAVLink Developer Guide).
+See [Contributing](https://mavlink.io/en/contributing/contributing.html) (upstream Developer Guide).

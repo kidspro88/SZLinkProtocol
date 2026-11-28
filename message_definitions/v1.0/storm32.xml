@@ -209,14 +209,14 @@ Documentation:
         <param index="4" label="Yaw rate" units="deg/s">Yaw/pan rate (positive: pan to the right). NaN to be ignored. The frame is determined by the GIMBAL_DEVICE_FLAGS_YAW_IN_xxx_FRAME flags.</param>
         <param index="5" label="Gimbal device flags" enum="GIMBAL_DEVICE_FLAGS">Gimbal device flags to be applied.</param>
         <param index="6" label="Gimbal manager flags" enum="MAV_STORM32_GIMBAL_MANAGER_FLAGS">Gimbal manager flags to be applied.</param>
-        <param index="7" label="Gimbal ID and client">Gimbal ID of the gimbal manager to address (component ID or 1-6 for non-MAVLink gimbal, 0 for all gimbals). Send command multiple times for more than one but not all gimbals. The client is copied into bits 8-15.</param>
+        <param index="7" label="Gimbal ID and client">Gimbal ID of the gimbal manager to address (component ID or 1-6 for non-SZLink gimbal, 0 for all gimbals). Send command multiple times for more than one but not all gimbals. The client is copied into bits 8-15.</param>
       </entry>
       <entry value="60010" name="MAV_CMD_STORM32_DO_GIMBAL_MANAGER_SETUP" hasLocation="false" isDestination="false">
         <wip/>
         <!-- WIP -->
         <description>Command to configure a gimbal manager. A gimbal device is never to react to this command. The selected profile is reported in the STORM32_GIMBAL_MANAGER_STATUS message.</description>
         <param index="1" label="Profile" enum="MAV_STORM32_GIMBAL_MANAGER_PROFILE">Gimbal manager profile (0 = default).</param>
-        <param index="7" label="Gimbal ID">Gimbal ID of the gimbal manager to address (component ID or 1-6 for non-MAVLink gimbal, 0 for all gimbals). Send command multiple times for more than one but not all gimbals.</param>
+        <param index="7" label="Gimbal ID">Gimbal ID of the gimbal manager to address (component ID or 1-6 for non-SZLink gimbal, 0 for all gimbals). Send command multiple times for more than one but not all gimbals.</param>
       </entry>
       <entry value="60020" name="MAV_CMD_QSHOT_DO_CONFIGURE" hasLocation="false" isDestination="false">
         <wip/>
@@ -303,7 +303,7 @@ Documentation:
     <message id="60010" name="STORM32_GIMBAL_MANAGER_INFORMATION">
       <!-- Stable, may grow however -->
       <description>Information about a gimbal manager. This message should be requested by a ground station using MAV_CMD_REQUEST_MESSAGE. It mirrors some fields of the GIMBAL_DEVICE_INFORMATION message, but not all. If the additional information is desired, also GIMBAL_DEVICE_INFORMATION should be requested.</description>
-      <field type="uint8_t" name="gimbal_id" instance="true">Gimbal ID (component ID or 1-6 for non-MAVLink gimbal) that this gimbal manager is responsible for.</field>
+      <field type="uint8_t" name="gimbal_id" instance="true">Gimbal ID (component ID or 1-6 for non-SZLink gimbal) that this gimbal manager is responsible for.</field>
       <field type="uint32_t" name="device_cap_flags" enum="GIMBAL_DEVICE_CAP_FLAGS">Gimbal device capability flags. Same flags as reported by GIMBAL_DEVICE_INFORMATION. The flag is only 16 bit wide, but stored in 32 bit, for backwards compatibility (high word is zero).</field>
       <field type="uint32_t" name="manager_cap_flags" enum="MAV_STORM32_GIMBAL_MANAGER_CAP_FLAGS">Gimbal manager capability flags.</field>
       <field type="float" name="roll_min" units="rad" invalid="NaN">Hardware minimum roll angle (positive: roll to the right). NaN if unknown.</field>
@@ -316,7 +316,7 @@ Documentation:
     <message id="60011" name="STORM32_GIMBAL_MANAGER_STATUS">
       <!-- Stable, may grow however -->
       <description>Message reporting the current status of a gimbal manager. This message should be broadcast at a low regular rate (e.g. 1 Hz, may be increase momentarily to e.g. 5 Hz for a period of 1 sec after a change).</description>
-      <field type="uint8_t" name="gimbal_id" instance="true">Gimbal ID (component ID or 1-6 for non-MAVLink gimbal) that this gimbal manager is responsible for.</field>
+      <field type="uint8_t" name="gimbal_id" instance="true">Gimbal ID (component ID or 1-6 for non-SZLink gimbal) that this gimbal manager is responsible for.</field>
       <field type="uint8_t" name="supervisor" enum="MAV_STORM32_GIMBAL_MANAGER_CLIENT">Client who is currently supervisor (0 = none).</field>
       <field type="uint16_t" name="device_flags" enum="GIMBAL_DEVICE_FLAGS">Gimbal device flags currently applied. Same flags as reported by GIMBAL_DEVICE_ATTITUDE_STATUS.</field>
       <field type="uint16_t" name="manager_flags" enum="MAV_STORM32_GIMBAL_MANAGER_FLAGS">Gimbal manager flags currently applied.</field>
@@ -327,7 +327,7 @@ Documentation:
       <description>Message to a gimbal manager to control the gimbal attitude. Angles and rates can be set to NaN according to use case. A gimbal device is never to react to this message.</description>
       <field type="uint8_t" name="target_system">System ID</field>
       <field type="uint8_t" name="target_component">Component ID</field>
-      <field type="uint8_t" name="gimbal_id" instance="true">Gimbal ID of the gimbal manager to address (component ID or 1-6 for non-MAVLink gimbal, 0 for all gimbals). Send command multiple times for more than one but not all gimbals.</field>
+      <field type="uint8_t" name="gimbal_id" instance="true">Gimbal ID of the gimbal manager to address (component ID or 1-6 for non-SZLink gimbal, 0 for all gimbals). Send command multiple times for more than one but not all gimbals.</field>
       <field type="uint8_t" name="client" enum="MAV_STORM32_GIMBAL_MANAGER_CLIENT">Client which is contacting the gimbal manager (must be set).</field>
       <field type="uint16_t" name="device_flags" enum="GIMBAL_DEVICE_FLAGS" invalid="UINT16_MAX">Gimbal device flags to be applied (UINT16_MAX to be ignored). Same flags as used in GIMBAL_DEVICE_SET_ATTITUDE.</field>
       <field type="uint16_t" name="manager_flags" enum="MAV_STORM32_GIMBAL_MANAGER_FLAGS" invalid="0">Gimbal manager flags to be applied (0 to be ignored).</field>
@@ -341,7 +341,7 @@ Documentation:
       <description>Message to a gimbal manager to control the gimbal tilt and pan angles. Angles and rates can be set to NaN according to use case. A gimbal device is never to react to this message.</description>
       <field type="uint8_t" name="target_system">System ID</field>
       <field type="uint8_t" name="target_component">Component ID</field>
-      <field type="uint8_t" name="gimbal_id" instance="true">Gimbal ID of the gimbal manager to address (component ID or 1-6 for non-MAVLink gimbal, 0 for all gimbals). Send command multiple times for more than one but not all gimbals.</field>
+      <field type="uint8_t" name="gimbal_id" instance="true">Gimbal ID of the gimbal manager to address (component ID or 1-6 for non-SZLink gimbal, 0 for all gimbals). Send command multiple times for more than one but not all gimbals.</field>
       <field type="uint8_t" name="client" enum="MAV_STORM32_GIMBAL_MANAGER_CLIENT">Client which is contacting the gimbal manager (must be set).</field>
       <field type="uint16_t" name="device_flags" enum="GIMBAL_DEVICE_FLAGS" invalid="UINT16_MAX">Gimbal device flags to be applied (UINT16_MAX to be ignored). Same flags as used in GIMBAL_DEVICE_SET_ATTITUDE.</field>
       <field type="uint16_t" name="manager_flags" enum="MAV_STORM32_GIMBAL_MANAGER_FLAGS" invalid="0">Gimbal manager flags to be applied (0 to be ignored).</field>
@@ -355,7 +355,7 @@ Documentation:
       <description>Message to a gimbal manager to correct the gimbal roll angle. This message is typically used to manually correct for a tilted horizon in operation. A gimbal device is never to react to this message.</description>
       <field type="uint8_t" name="target_system">System ID</field>
       <field type="uint8_t" name="target_component">Component ID</field>
-      <field type="uint8_t" name="gimbal_id" instance="true">Gimbal ID of the gimbal manager to address (component ID or 1-6 for non-MAVLink gimbal, 0 for all gimbals). Send command multiple times for more than one but not all gimbals.</field>
+      <field type="uint8_t" name="gimbal_id" instance="true">Gimbal ID of the gimbal manager to address (component ID or 1-6 for non-SZLink gimbal, 0 for all gimbals). Send command multiple times for more than one but not all gimbals.</field>
       <field type="uint8_t" name="client" enum="MAV_STORM32_GIMBAL_MANAGER_CLIENT">Client which is contacting the gimbal manager (must be set).</field>
       <field type="float" name="roll" units="rad">Roll angle (positive to roll to the right).</field>
     </message>
@@ -403,23 +403,23 @@ Documentation:
     </message>
     <message id="60045" name="MLRS_RADIO_LINK_STATS">
       <!-- Stable -->
-      <description>Radio link statistics for a MAVLink RC receiver or transmitter and other links. Tx: ground-side device, Rx: vehicle-side device.
+      <description>Radio link statistics for an SZLink RC receiver or transmitter and other links. Tx: ground-side device, Rx: vehicle-side device.
         The message is normally emitted in regular time intervals upon each actual or expected reception of an over-the-air data packet on the link.
-        A MAVLink RC receiver should emit it shortly after it emits a RADIO_RC_CHANNELS message (if it is emitting that message).
-        Per default, rssi values are in MAVLink units: 0 represents weakest signal, 254 represents maximum signal, UINT8_MAX represents unknown.
+        An SZLink RC receiver should emit it shortly after it emits a RADIO_RC_CHANNELS message (if it is emitting that message).
+        Per default, rssi values are in SZLink units: 0 represents weakest signal, 254 represents maximum signal, UINT8_MAX represents unknown.
         The RADIO_LINK_STATS_FLAGS_RSSI_DBM flag is set if the rssi units are negative dBm: 1..254 correspond to -1..-254 dBm, 0 represents no reception, UINT8_MAX represents unknown.
         The target_system field should normally be set to the system id of the system the link is connected to, typically the flight controller.
         The target_component field can normally be set to 0, so that all components of the system can receive the message.
-        Note: The frequency fields are extensions to ensure that they are located at the end of the serialized payload and subject to MAVLink's trailing-zero trimming.
+        Note: The frequency fields are extensions to ensure that they are located at the end of the serialized payload and subject to SZLink's trailing-zero trimming.
       </description>
       <field type="uint8_t" name="target_system">System ID (ID of target system, normally flight controller).</field>
       <field type="uint8_t" name="target_component">Component ID (normally 0 for broadcast).</field>
       <field type="uint16_t" name="flags" enum="MLRS_RADIO_LINK_STATS_FLAGS">Radio link statistics flags.</field>
       <field type="uint8_t" name="rx_LQ_rc" units="c%" invalid="UINT8_MAX">Link quality of RC data stream from Tx to Rx. Values: 1..100, 0: no link connection, UINT8_MAX: unknown.</field>
-      <field type="uint8_t" name="rx_LQ_ser" units="c%" invalid="UINT8_MAX">Link quality of serial MAVLink data stream from Tx to Rx. Values: 1..100, 0: no link connection, UINT8_MAX: unknown.</field>
+      <field type="uint8_t" name="rx_LQ_ser" units="c%" invalid="UINT8_MAX">Link quality of serial SZLink data stream from Tx to Rx. Values: 1..100, 0: no link connection, UINT8_MAX: unknown.</field>
       <field type="uint8_t" name="rx_rssi1" invalid="UINT8_MAX">Rssi of antenna 1. 0: no reception, UINT8_MAX: unknown.</field>
       <field type="int8_t" name="rx_snr1" invalid="INT8_MAX">Noise on antenna 1. Radio link dependent. INT8_MAX: unknown.</field>
-      <field type="uint8_t" name="tx_LQ_ser" units="c%" invalid="UINT8_MAX">Link quality of serial MAVLink data stream from Rx to Tx. Values: 1..100, 0: no link connection, UINT8_MAX: unknown.</field>
+      <field type="uint8_t" name="tx_LQ_ser" units="c%" invalid="UINT8_MAX">Link quality of serial SZLink data stream from Rx to Tx. Values: 1..100, 0: no link connection, UINT8_MAX: unknown.</field>
       <field type="uint8_t" name="tx_rssi1" invalid="UINT8_MAX">Rssi of antenna 1. 0: no reception. UINT8_MAX: unknown.</field>
       <field type="int8_t" name="tx_snr1" invalid="INT8_MAX">Noise on antenna 1. Radio link dependent. INT8_MAX: unknown.</field>
       <field type="uint8_t" name="rx_rssi2" invalid="UINT8_MAX">Rssi of antenna 2. 0: no reception, UINT8_MAX: use rx_rssi1 if it is known else unknown.</field>
@@ -456,7 +456,7 @@ Documentation:
     <message id="60047" name="MLRS_RADIO_LINK_FLOW_CONTROL">
       <wip/>
       <!-- WIP -->
-      <description>Injected by a radio link endpoint into the MAVLink stream for purposes of flow control. Should be emitted only by components with component id MAV_COMP_ID_TELEMETRY_RADIO.</description>
+      <description>Injected by a radio link endpoint into the SZLink stream for purposes of flow control. Should be emitted only by components with component id MAV_COMP_ID_TELEMETRY_RADIO.</description>
       <field type="uint16_t" name="tx_ser_rate" units="bytes/s" invalid="UINT16_MAX">Transmitted bytes per second, UINT16_MAX: invalid/unknown.</field>
       <field type="uint16_t" name="rx_ser_rate" units="bytes/s" invalid="UINT16_MAX">Received bytes per second, UINT16_MAX: invalid/unknown.</field>
       <field type="uint8_t" name="tx_used_ser_bandwidth" units="c%" invalid="UINT8_MAX">Transmit bandwidth consumption. Values: 0..100, UINT8_MAX: invalid/unknown.</field>

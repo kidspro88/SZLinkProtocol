@@ -1,10 +1,10 @@
-// Simple example receiving and sending MAVLink v2 over UDP using the C++11
-// MAVLink library, based on POSIX APIs (e.g. Linux, BSD, macOS).
+// Simple example receiving and sending SZLink messages (MAVLink v2 wire
+// format) over UDP using the C++11 SZLink library, based on POSIX APIs (e.g. Linux, BSD, macOS).
 //
 // This is the C++11 counterpart to ../c/udp_example.c. Instead of the C
 // pack/decode functions it uses the generated message structs (e.g.
-// mavlink::minimal::msg::HEARTBEAT) together with mavlink::MsgMap to
-// serialize and deserialize to and from a mavlink_message_t.
+// szlink::minimal::msg::HEARTBEAT) together with szlink::MsgMap to
+// serialize and deserialize to and from a szlink_message_t.
 
 #include <cerrno>
 #include <cstdint>
@@ -17,18 +17,18 @@
 #include <sys/time.h>
 #include <ctime>
 
-// The C++11 library is header-only and lives in the `mavlink` namespace. It
-// also pulls in the C library (functions like mavlink_parse_char) into that
+// The C++11 library is header-only and lives in the `szlink` namespace. It
+// also pulls in the C library (functions like szlink_parse_char) into that
 // same namespace.
-#include <mavlink/common/common.hpp>
+#include <szlink/common/common.hpp>
 
 // The C++11 library does not ship a message registry, so the user has to
-// provide this lookup. mavlink_parse_char() calls it (indirectly) to find the
+// provide this lookup. szlink_parse_char() calls it (indirectly) to find the
 // length and CRC extra for an incoming message id. We build it from the
 // dialect's MESSAGE_ENTRIES table, which is sorted by message id.
-namespace mavlink {
+namespace szlink {
 
-const mavlink_msg_entry_t* mavlink_get_msg_entry(uint32_t msgid)
+const szlink_msg_entry_t* szlink_get_msg_entry(uint32_t msgid)
 {
     for (const auto& entry : common::MESSAGE_ENTRIES) {
         if (entry.msgid == msgid) {
@@ -38,9 +38,9 @@ const mavlink_msg_entry_t* mavlink_get_msg_entry(uint32_t msgid)
     return nullptr;
 }
 
-} // namespace mavlink
+} // namespace szlink
 
-static void handle_heartbeat(const mavlink::mavlink_message_t& message);
+static void handle_heartbeat(const szlink::szlink_message_t& message);
 static void receive_some(
     int socket_fd, struct sockaddr_in& src_addr, socklen_t& src_addr_len, bool& src_addr_set);
 static void send_some(
@@ -120,17 +120,17 @@ void receive_some(
 
     src_addr_set = true;
 
-    mavlink::mavlink_message_t message;
-    mavlink::mavlink_status_t status;
+    szlink::szlink_message_t message;
+    szlink::szlink_status_t status;
     for (int i = 0; i < ret; ++i) {
-        if (mavlink::mavlink_parse_char(mavlink::MAVLINK_COMM_0, buffer[i], &message, &status) == 1) {
+        if (szlink::szlink_parse_char(szlink::SZLINK_COMM_0, buffer[i], &message, &status) == 1) {
 
             // printf(
             //     "Received message %d from %d/%d\n",
             //     message.msgid, message.sysid, message.compid);
 
             switch (message.msgid) {
-            case mavlink::minimal::msg::HEARTBEAT::MSG_ID:
+            case szlink::minimal::msg::HEARTBEAT::MSG_ID:
                 handle_heartbeat(message);
                 break;
             }
@@ -138,22 +138,22 @@ void receive_some(
     }
 }
 
-void handle_heartbeat(const mavlink::mavlink_message_t& message)
+void handle_heartbeat(const szlink::szlink_message_t& message)
 {
     // Deserialize the raw message into the generated HEARTBEAT struct.
-    mavlink::minimal::msg::HEARTBEAT heartbeat;
-    mavlink::MsgMap map(&message);
+    szlink::minimal::msg::HEARTBEAT heartbeat;
+    szlink::MsgMap map(&message);
     heartbeat.deserialize(map);
 
     printf("Got heartbeat from ");
-    switch (static_cast<mavlink::minimal::MAV_AUTOPILOT>(heartbeat.autopilot)) {
-    case mavlink::minimal::MAV_AUTOPILOT::GENERIC:
+    switch (static_cast<szlink::minimal::MAV_AUTOPILOT>(heartbeat.autopilot)) {
+    case szlink::minimal::MAV_AUTOPILOT::GENERIC:
         printf("generic");
         break;
-    case mavlink::minimal::MAV_AUTOPILOT::ARDUPILOTMEGA:
+    case szlink::minimal::MAV_AUTOPILOT::ARDUPILOTMEGA:
         printf("ArduPilot");
         break;
-    case mavlink::minimal::MAV_AUTOPILOT::PX4:
+    case szlink::minimal::MAV_AUTOPILOT::PX4:
         printf("PX4");
         break;
     default:
@@ -177,33 +177,33 @@ void send_some(int socket_fd, const struct sockaddr_in& src_addr, socklen_t src_
 void send_heartbeat(int socket_fd, const struct sockaddr_in& src_addr, socklen_t src_addr_len)
 {
     // Fill in the generated HEARTBEAT struct.
-    mavlink::minimal::msg::HEARTBEAT heartbeat;
-    heartbeat.type = static_cast<uint8_t>(mavlink::minimal::MAV_TYPE::GENERIC);
-    heartbeat.autopilot = static_cast<uint8_t>(mavlink::minimal::MAV_AUTOPILOT::GENERIC);
+    szlink::minimal::msg::HEARTBEAT heartbeat;
+    heartbeat.type = static_cast<uint8_t>(szlink::minimal::MAV_TYPE::GENERIC);
+    heartbeat.autopilot = static_cast<uint8_t>(szlink::minimal::MAV_AUTOPILOT::GENERIC);
     heartbeat.base_mode = 0;
     heartbeat.custom_mode = 0;
-    heartbeat.system_status = static_cast<uint8_t>(mavlink::minimal::MAV_STATE::STANDBY);
+    heartbeat.system_status = static_cast<uint8_t>(szlink::minimal::MAV_STATE::STANDBY);
 
-    // Serialize it into a mavlink_message_t ...
-    mavlink::mavlink_message_t message;
-    mavlink::MsgMap map(message);
+    // Serialize it into a szlink_message_t ...
+    szlink::szlink_message_t message;
+    szlink::MsgMap map(message);
     heartbeat.serialize(map);
 
     // ... and finalize it by adding the header and CRC. This is where the
     // system and component id as well as the sequence number get filled in.
     const uint8_t system_id = 42;
-    mavlink::mavlink_finalize_message_chan(
+    szlink::szlink_finalize_message_chan(
         &message,
         system_id,
-        static_cast<uint8_t>(mavlink::minimal::MAV_COMPONENT::COMP_ID_PERIPHERAL),
-        mavlink::MAVLINK_COMM_0,
+        static_cast<uint8_t>(szlink::minimal::MAV_COMPONENT::COMP_ID_PERIPHERAL),
+        szlink::SZLINK_COMM_0,
         heartbeat.MIN_LENGTH,
         heartbeat.LENGTH,
         heartbeat.CRC_EXTRA);
 
     // Now we can convert the message into a byte buffer to send it out.
-    uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
-    const int len = mavlink::mavlink_msg_to_send_buffer(buffer, &message);
+    uint8_t buffer[SZLINK_MAX_PACKET_LEN];
+    const int len = szlink::szlink_msg_to_send_buffer(buffer, &message);
 
     const int ret = sendto(
         socket_fd, buffer, len, 0, reinterpret_cast<const struct sockaddr*>(&src_addr),

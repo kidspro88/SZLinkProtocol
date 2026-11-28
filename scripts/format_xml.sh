@@ -14,7 +14,7 @@ show_help() {
     cat <<EOF
 Usage: $(basename "$0") [OPTIONS] [xml_file]
 
-Format or check formatting of MAVLink XML definition files using xmllint.
+Format or check formatting of SZLink XML definition files using xmllint.
 
 Options:
   -h        Show this help message and exit.

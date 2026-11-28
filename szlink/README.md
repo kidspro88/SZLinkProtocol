@@ -36,7 +36,10 @@ and the MAVLink signature is dropped: authentication is done by the SEC layer.
 
 The C API is the MAVLink C API with every `mavlink`/`MAVLINK` prefix renamed to
 `szlink`/`SZLINK`, plus the frame layer in `szlink_frame.h`. `MAV_*` enum
-values keep their names.
+values keep their names. `szlinkgen.py` copies the frame layer (`szlink_frame.h`,
+`szlink_ecc.h`, `szlink_sec.h`, `monocypher.h`, `monocypher.c`) into the root of
+the output directory, so `-I<output>` is enough; compile `<output>/monocypher.c`
+into the program that defines `SZLINK_SEC_IMPLEMENTATION`.
 
 ```bash
 pip install -r pymavlink/requirements.txt

@@ -7,7 +7,7 @@ Range of IDs:
   messages: 52600 - 52609
   commands: 52600 - 52609
 Documentation:
-  WIP messages for controlling LED strips attached to MAVLink enabled vehicles.
+  WIP messages for controlling LED strips attached to SZLink enabled vehicles.
 -->
 <mavlink>
   <include>common.xml</include>

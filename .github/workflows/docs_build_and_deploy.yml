@@ -32,7 +32,7 @@ jobs:
       - name: Generate markdown from XML
         run: |
           cd doc
-          python3 mavlink_xml_to_markdown.py
+          python3 szlink_xml_to_markdown.py
 
       - name: Upload docs artifact
         uses: actions/upload-artifact@v7
@@ -66,5 +66,5 @@ jobs:
            git config --global user.name "${{ secrets.PX4BUILDBOT_USER }}"
            git config --global user.email "${{ secrets.PX4BUILDBOT_EMAIL }}"
            git add en/messages/*
-           git commit -a -m "MAVLink messages update `date`"
+           git commit -a -m "SZLink messages update `date`"
            git push origin master

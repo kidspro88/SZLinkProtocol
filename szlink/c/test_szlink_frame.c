@@ -68,7 +68,7 @@ static void test_rc_cmd_roundtrip(void)
     CHECK(p.rx_ok == 1 && p.crc_errors == 0);
 }
 
-static void test_standard_mavlink_message_on_telemetry(void)
+static void test_standard_szlink_message_on_telemetry(void)
 {
     szlink_message_t tx, rx;
     szlink_heartbeat_t hb;
@@ -241,7 +241,7 @@ static void test_wide_sysid_rejected(void)
 int main(void)
 {
     test_rc_cmd_roundtrip();
-    test_standard_mavlink_message_on_telemetry();
+    test_standard_szlink_message_on_telemetry();
     test_video_pkt_full_payload();
     test_corruption_is_rejected();
     test_stream_with_garbage_and_resync();

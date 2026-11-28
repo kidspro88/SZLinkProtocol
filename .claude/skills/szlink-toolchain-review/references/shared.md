@@ -21,8 +21,8 @@ To test it against a fixture, make a throwaway git repo under the scratch dir wi
 
 ## Scope
 
-In scope: `scripts/`, `doc/`, `.github/`, `CMakeLists.txt`, `MAVLinkConfig.cmake.in`, `examples/`, the `pymavlink` submodule pointer.
-Out of scope: XML definitions (`mavlink-xml-review`), and pymavlink's own code except as pulled in by a bump — findings in pymavlink code are reported, but the fix belongs upstream in https://github.com/ArduPilot/pymavlink.
+In scope: `scripts/`, `doc/`, `.github/`, `CMakeLists.txt`, `SZLinkConfig.cmake.in`, `examples/`, the `pymavlink` submodule pointer.
+Out of scope: XML definitions (`szlink-xml-review`), and pymavlink's own code except as pulled in by a bump — findings in pymavlink code are reported, but the fix belongs upstream in https://github.com/ArduPilot/pymavlink.
 
 ## Sources of truth
 
@@ -30,7 +30,7 @@ In precedence order; when two contradict, report the contradiction.
 
 1. **What the code does when run** — base and head, on fixtures and on the real dialects. Observed behaviour beats what the PR, a comment, or a docstring says it does.
 2. **The PR description and linked issue** — what problem it claims to solve.
-3. **The MAVLink Developer Guide** (https://github.com/mavlink/mavlink-devguide, local clone `~/github/mavlink/mavlink-devguide`) — `en/guide/serialization.md`, `en/guide/define_xml_element.md`, `en/guide/xml_schema.md`, `en/guide/mavlink_version.md`: the rules the tools enforce. A check that disagrees with the guide is a finding either way.
+3. **The upstream protocol Developer Guide** (https://github.com/mavlink/mavlink-devguide, local clone `~/github/mavlink/mavlink-devguide`) — `en/guide/serialization.md`, `en/guide/define_xml_element.md`, `en/guide/xml_schema.md`, `en/guide/mavlink_version.md`: the rules the tools enforce. A check that disagrees with the guide is a finding either way.
 4. **`AGENTS.md`** — what the checks are supposed to allow and forbid.
 5. **Downstream build and deploy code** (PX4, ArduPilot, the workflows here) — how the tools are actually invoked.
 6. **Git history** — earlier fixes to the same tool, for sibling cases and repeated mistakes.

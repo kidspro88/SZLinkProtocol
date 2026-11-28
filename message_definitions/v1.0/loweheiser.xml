@@ -4,7 +4,7 @@
   <!-- company URL: https://www.loweheiser.com/ -->
   <!-- company LinkeIn: https://www.linkedin.com/company/loweheiser -->
   <!-- email contact: info@loweheiser.com -->
-  <!-- mavlink ID range: 10150 - 10199 -->
+  <!-- szlink ID range: 10150 - 10199 -->
   <include>minimal.xml</include>
   <enums>
     <enum name="MAV_CMD">

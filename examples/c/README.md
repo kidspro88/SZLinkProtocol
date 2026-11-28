@@ -1,10 +1,10 @@
 # Simple C example
 
-Simple example receiving and sending MAVLink v2 over UDP based on POSIX APIs (e.g. Linux, BSD, macOS).
+Simple example receiving and sending SZLink messages (MAVLink v2 wire format) over UDP based on POSIX APIs (e.g. Linux, BSD, macOS).
 
-## Install MAVLink
+## Install SZLink
 
-In top level directory, build and install the MAVLink headers locally into the install folder:
+In top level directory, build and install the SZLink headers locally into the install folder:
 
 ```
 cmake -Bbuild -H. -DCMAKE_INSTALL_PREFIX=install

@@ -30,11 +30,11 @@ $xsltproc->importStylesheet($xsl_doc);
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
 <html>
 <head>
-	<title>MAVLINK Common Message set specifications</title>
-	<link rel="stylesheet" type="text/css" href="mavlink.css">
+	<title>SZLINK Common Message set specifications</title>
+	<link rel="stylesheet" type="text/css" href="szlink.css">
 </head>
 <body>
-<h1>MAVLINK Common Message Set</h1>
+<h1>SZLINK Common Message Set</h1>
 
 <p>
 These messages define the common message set, which is the reference message set implemented by most ground control stations and autopilots.

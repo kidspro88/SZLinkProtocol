@@ -3,7 +3,7 @@
   <!-- ClearSky Air-Link contact info:          -->
   <!-- company URL: https://air-link.space/     -->
   <!-- email contact: drone@air-link.space      -->
-  <!-- mavlink ID range: 52000 - 52099          -->
+  <!-- szlink ID range: 52000 - 52099          -->
   <version>3</version>
   <enums>
     <enum name="AIRLINK_AUTH_RESPONSE_TYPE">

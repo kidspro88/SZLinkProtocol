@@ -343,10 +343,10 @@
         <description>Set current public keys in the bootloader. Data consists of a one byte public key index followed by the public keys. With 32 byte keys this allows for up to 6 keys to be set in one request. Keys outside of the range that is being set will remain unchanged.</description>
       </entry>
       <entry value="5" name="SECURE_COMMAND_GET_REMOTEID_CONFIG">
-        <description>Get config data for remote ID module. This command should be sent to the component ID of the flight controller which will forward it to the RemoteID module either over mavlink or DroneCAN. Data format is specific to the RemoteID implementation, see RemoteID firmware documentation for details.</description>
+        <description>Get config data for remote ID module. This command should be sent to the component ID of the flight controller which will forward it to the RemoteID module either over szlink or DroneCAN. Data format is specific to the RemoteID implementation, see RemoteID firmware documentation for details.</description>
       </entry>
       <entry value="6" name="SECURE_COMMAND_SET_REMOTEID_CONFIG">
-        <description>Set config data for remote ID module. This command should be sent to the component ID of the flight controller which will forward it to the RemoteID module either over mavlink or DroneCAN. Data format is specific to the RemoteID implementation, see RemoteID firmware documentation for details.</description>
+        <description>Set config data for remote ID module. This command should be sent to the component ID of the flight controller which will forward it to the RemoteID module either over szlink or DroneCAN. Data format is specific to the RemoteID implementation, see RemoteID firmware documentation for details.</description>
       </entry>
       <entry value="7" name="SECURE_COMMAND_FLASH_BOOTLOADER">
         <description>Flash bootloader from local storage. Data is the filename to use for the bootloader. This is intended to be used with MAVFtp to upload a new bootloader to a microSD before flashing.</description>
@@ -1819,7 +1819,7 @@
       <field type="float" name="rpm1">RPM Sensor1.</field>
       <field type="float" name="rpm2">RPM Sensor2.</field>
     </message>
-    <!-- ardupilot specific mavlink2 messages starting at 11000-->
+    <!-- ardupilot specific MAVLink2 messages starting at 11000-->
     <message id="11000" name="DEVICE_OP_READ">
       <description>Read registers for a device.</description>
       <field type="uint8_t" name="target_system">System ID.</field>

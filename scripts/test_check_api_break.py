@@ -530,7 +530,7 @@ class BaseCommitTests(unittest.TestCase):
                 return "1122334\n"
             raise subprocess.CalledProcessError(1, cmd)
 
-        env = dict(self._NO_CI_ENV, MAVLINK_BASE_REF="pr-target")
+        env = dict(self._NO_CI_ENV, SZLINK_BASE_REF="pr-target")
         with patch.dict(os.environ, env), \
              patch("subprocess.check_output", side_effect=fake_check_output), \
              patch("subprocess.run"):
@@ -550,7 +550,7 @@ class BaseCommitTests(unittest.TestCase):
                 return "0000000\n"  # a stale local branch - should lose
             raise subprocess.CalledProcessError(1, cmd)
 
-        env = dict(self._NO_CI_ENV, MAVLINK_BASE_REF="pr-target")
+        env = dict(self._NO_CI_ENV, SZLINK_BASE_REF="pr-target")
         with patch.dict(os.environ, env), \
              patch("subprocess.check_output", side_effect=fake_check_output), \
              patch("subprocess.run"):
@@ -577,7 +577,7 @@ class BaseCommitTests(unittest.TestCase):
                 "GITHUB_EVENT_PATH": event_path,
                 "GITHUB_EVENT_NAME": "pull_request",
                 # Should be ignored: the CI event payload outranks it.
-                "MAVLINK_BASE_REF": "should-be-ignored",
+                "SZLINK_BASE_REF": "should-be-ignored",
             }
             with patch.dict(os.environ, env), \
                  patch("subprocess.check_output", side_effect=fake_check_output):

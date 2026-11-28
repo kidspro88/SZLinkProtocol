@@ -2,7 +2,7 @@
 <mavlink xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../pymavlink/generator/mavschema.xsd">
   <!-- Modular Architecture for Reconfigurable Simulation of Helicopters, a research manned flight simulator developed and used at Politecnico di Milano. -->
   <!-- Documentation: https://marsh-sim.github.io/ -->
-  <!-- mavlink ID range: 52500 - 52599 -->
+  <!-- szlink ID range: 52500 - 52599 -->
   <include>common.xml</include>
   <dialect>3</dialect>
   <enums>

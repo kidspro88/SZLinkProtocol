@@ -8,7 +8,7 @@ Build the **smallest fixture** that exhibits the stated problem:
 
 - For `check_api_break.py`: a base XML and a head XML (see the fixture style in `scripts/test_check_api_break.py` — `BASE_XML`, `EXT_XML`), committed into a throwaway git repo as `shared.md` describes.
 - For `xml_consistency_check.py`: one XML file, run with `-f <file>`.
-- For `mavlink_xml_to_markdown.py`: an XML file (with its includes) and the expected markdown fragment.
+- For `szlink_xml_to_markdown.py`: an XML file (with its includes) and the expected markdown fragment.
 - For a pymavlink generator change: an XML file plus generated output for the affected language(s); for a runtime change, a short script that packs/unpacks the affected message.
 - For build/CMake: the configure/build command that failed.
 

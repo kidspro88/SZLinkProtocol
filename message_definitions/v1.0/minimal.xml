@@ -29,7 +29,7 @@
         <description>Generic autopilot supporting the full mission command set</description>
       </entry>
       <entry value="8" name="MAV_AUTOPILOT_INVALID">
-        <description>No valid autopilot, e.g. a GCS or other MAVLink component</description>
+        <description>No valid autopilot, e.g. a GCS or other SZLink component</description>
       </entry>
       <entry value="9" name="MAV_AUTOPILOT_PPZ">
         <description>PPZ UAV - http://nongnu.org/paparazzi</description>
@@ -75,7 +75,7 @@
       </entry>
     </enum>
     <enum name="MAV_TYPE">
-      <description>MAVLINK component type reported in HEARTBEAT message. Flight controllers must report the type of the vehicle on which they are mounted (e.g. MAV_TYPE_OCTOROTOR). All other components must report a value appropriate for their type (e.g. a camera must use MAV_TYPE_CAMERA).</description>
+      <description>SZLINK component type reported in HEARTBEAT message. Flight controllers must report the type of the vehicle on which they are mounted (e.g. MAV_TYPE_OCTOROTOR). All other components must report a value appropriate for their type (e.g. a camera must use MAV_TYPE_CAMERA).</description>
       <entry value="0" name="MAV_TYPE_GENERIC">
         <description>Generic micro air vehicle</description>
       </entry>
@@ -312,7 +312,7 @@
       </entry>
     </enum>
     <enum name="MAV_COMPONENT">
-      <description>Legacy component ID values for particular types of hardware/software that might make up a MAVLink system (autopilot, cameras, servos, avoidance systems etc.).
+      <description>Legacy component ID values for particular types of hardware/software that might make up an SZLink system (autopilot, cameras, servos, avoidance systems etc.).
 
         Components are not required or expected to use IDs with names that correspond to their type or function, but may choose to do so.
         Using an ID that matches the type may slightly reduce the chances of component id clashes, as, for historical reasons, it is less likely to be used by some other type of component.
@@ -332,229 +332,229 @@
       </entry>
       <!-- Component ids from 25-99 are reserved for private OEM component definitions (and may be incompatible with other private components). Note that if this range is later reduced, higher ids will be reallocated first. -->
       <entry value="25" name="MAV_COMP_ID_USER1">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="26" name="MAV_COMP_ID_USER2">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="27" name="MAV_COMP_ID_USER3">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="28" name="MAV_COMP_ID_USER4">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="29" name="MAV_COMP_ID_USER5">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="30" name="MAV_COMP_ID_USER6">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="31" name="MAV_COMP_ID_USER7">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="32" name="MAV_COMP_ID_USER8">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="33" name="MAV_COMP_ID_USER9">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="34" name="MAV_COMP_ID_USER10">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="35" name="MAV_COMP_ID_USER11">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="36" name="MAV_COMP_ID_USER12">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="37" name="MAV_COMP_ID_USER13">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="38" name="MAV_COMP_ID_USER14">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="39" name="MAV_COMP_ID_USER15">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="40" name="MAV_COMP_ID_USER16">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="41" name="MAV_COMP_ID_USER17">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="42" name="MAV_COMP_ID_USER18">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="43" name="MAV_COMP_ID_USER19">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="44" name="MAV_COMP_ID_USER20">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="45" name="MAV_COMP_ID_USER21">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="46" name="MAV_COMP_ID_USER22">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="47" name="MAV_COMP_ID_USER23">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="48" name="MAV_COMP_ID_USER24">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="49" name="MAV_COMP_ID_USER25">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="50" name="MAV_COMP_ID_USER26">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="51" name="MAV_COMP_ID_USER27">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="52" name="MAV_COMP_ID_USER28">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="53" name="MAV_COMP_ID_USER29">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="54" name="MAV_COMP_ID_USER30">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="55" name="MAV_COMP_ID_USER31">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="56" name="MAV_COMP_ID_USER32">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="57" name="MAV_COMP_ID_USER33">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="58" name="MAV_COMP_ID_USER34">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="59" name="MAV_COMP_ID_USER35">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="60" name="MAV_COMP_ID_USER36">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="61" name="MAV_COMP_ID_USER37">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="62" name="MAV_COMP_ID_USER38">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="63" name="MAV_COMP_ID_USER39">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="64" name="MAV_COMP_ID_USER40">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="65" name="MAV_COMP_ID_USER41">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="66" name="MAV_COMP_ID_USER42">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="67" name="MAV_COMP_ID_USER43">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="68" name="MAV_COMP_ID_TELEMETRY_RADIO">
         <description>Telemetry radio (e.g. SiK radio, or other component that emits RADIO_STATUS messages).</description>
       </entry>
       <entry value="69" name="MAV_COMP_ID_USER45">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="70" name="MAV_COMP_ID_USER46">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="71" name="MAV_COMP_ID_USER47">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="72" name="MAV_COMP_ID_USER48">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="73" name="MAV_COMP_ID_USER49">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="74" name="MAV_COMP_ID_USER50">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="75" name="MAV_COMP_ID_USER51">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="76" name="MAV_COMP_ID_USER52">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="77" name="MAV_COMP_ID_USER53">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="78" name="MAV_COMP_ID_USER54">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="79" name="MAV_COMP_ID_USER55">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="80" name="MAV_COMP_ID_USER56">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="81" name="MAV_COMP_ID_USER57">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="82" name="MAV_COMP_ID_USER58">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="83" name="MAV_COMP_ID_USER59">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="84" name="MAV_COMP_ID_USER60">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="85" name="MAV_COMP_ID_USER61">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="86" name="MAV_COMP_ID_USER62">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="87" name="MAV_COMP_ID_USER63">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="88" name="MAV_COMP_ID_USER64">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="89" name="MAV_COMP_ID_USER65">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="90" name="MAV_COMP_ID_USER66">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="91" name="MAV_COMP_ID_USER67">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="92" name="MAV_COMP_ID_USER68">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="93" name="MAV_COMP_ID_USER69">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="94" name="MAV_COMP_ID_USER70">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="95" name="MAV_COMP_ID_USER71">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="96" name="MAV_COMP_ID_USER72">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="97" name="MAV_COMP_ID_USER73">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="98" name="MAV_COMP_ID_USER74">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="99" name="MAV_COMP_ID_USER75">
-        <description>Id for a component on privately managed MAVLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
+        <description>Id for a component on privately managed SZLink network. Can be used for any purpose but may not be published by components outside of the private network.</description>
       </entry>
       <entry value="100" name="MAV_COMP_ID_CAMERA">
         <description>Camera #1.</description>
@@ -675,22 +675,22 @@
         <description>Battery #2.</description>
       </entry>
       <entry value="189" name="MAV_COMP_ID_MAVCAN">
-        <description>CAN over MAVLink client.</description>
+        <description>CAN over SZLink client.</description>
       </entry>
       <entry value="190" name="MAV_COMP_ID_MISSIONPLANNER">
         <description>Component that can generate/supply a mission flight plan (e.g. GCS or developer API).</description>
       </entry>
       <entry value="191" name="MAV_COMP_ID_ONBOARD_COMPUTER">
-        <description>Component that lives on the onboard computer (companion computer) and has some generic functionalities, such as settings system parameters and monitoring the status of some processes that don't directly speak mavlink and so on.</description>
+        <description>Component that lives on the onboard computer (companion computer) and has some generic functionalities, such as settings system parameters and monitoring the status of some processes that don't directly speak szlink and so on.</description>
       </entry>
       <entry value="192" name="MAV_COMP_ID_ONBOARD_COMPUTER2">
-        <description>Component that lives on the onboard computer (companion computer) and has some generic functionalities, such as settings system parameters and monitoring the status of some processes that don't directly speak mavlink and so on.</description>
+        <description>Component that lives on the onboard computer (companion computer) and has some generic functionalities, such as settings system parameters and monitoring the status of some processes that don't directly speak szlink and so on.</description>
       </entry>
       <entry value="193" name="MAV_COMP_ID_ONBOARD_COMPUTER3">
-        <description>Component that lives on the onboard computer (companion computer) and has some generic functionalities, such as settings system parameters and monitoring the status of some processes that don't directly speak mavlink and so on.</description>
+        <description>Component that lives on the onboard computer (companion computer) and has some generic functionalities, such as settings system parameters and monitoring the status of some processes that don't directly speak szlink and so on.</description>
       </entry>
       <entry value="194" name="MAV_COMP_ID_ONBOARD_COMPUTER4">
-        <description>Component that lives on the onboard computer (companion computer) and has some generic functionalities, such as settings system parameters and monitoring the status of some processes that don't directly speak mavlink and so on.</description>
+        <description>Component that lives on the onboard computer (companion computer) and has some generic functionalities, such as settings system parameters and monitoring the status of some processes that don't directly speak szlink and so on.</description>
       </entry>
       <entry value="195" name="MAV_COMP_ID_PATHPLANNER">
         <description>Component that finds an optimal path between points based on a certain constraint (e.g. minimum snap, shortest path, cost, etc.).</description>
@@ -729,7 +729,7 @@
         <description>Open Drone ID transmitter/receiver (Bluetooth/WiFi/Internet).</description>
       </entry>
       <entry value="240" name="MAV_COMP_ID_UDP_BRIDGE">
-        <description>Component to bridge MAVLink to UDP (i.e. from a UART).</description>
+        <description>Component to bridge SZLink to UDP (i.e. from a UART).</description>
       </entry>
       <entry value="241" name="MAV_COMP_ID_UART_BRIDGE">
         <description>Component to bridge to UART (i.e. from UDP).</description>

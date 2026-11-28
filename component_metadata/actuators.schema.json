@@ -244,7 +244,7 @@
 
         "functions_v1": {
             "type":         "object",
-            "description":  "Lists all actuator output functions. Each dict index defines an output function. '0' is special and always means 'Disabled'. The indexes and labels are expected to match with the parameter metadata for the function parameters (some parameters may not support all functions though). When sending a MAVLink command, e.g. MAV_CMD_ACTUATOR_TEST, 1000+<output function> is used.",
+            "description":  "Lists all actuator output functions. Each dict index defines an output function. '0' is special and always means 'Disabled'. The indexes and labels are expected to match with the parameter metadata for the function parameters (some parameters may not support all functions though). When sending an SZLink command, e.g. MAV_CMD_ACTUATOR_TEST, 1000+<output function> is used.",
 
             "patternProperties": {
                 "^\\d+$": {

@@ -4,7 +4,7 @@
   <!-- https://github.com/nasa/icarous                                 -->
   <!-- email contacts: Swee Balachandran: swee.balachandran@nianet.org -->
   <!--                 Cesar Munoz: cesar.a.munoz@nasa.gov             -->
-  <!-- mavlink ID range 42000 - 42099                                  -->
+  <!-- szlink ID range 42000 - 42099                                  -->
   <enums>
     <enum name="ICAROUS_TRACK_BAND_TYPES">
       <entry name="ICAROUS_TRACK_BAND_TYPE_NONE" value="0"/>

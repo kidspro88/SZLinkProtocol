@@ -12,7 +12,7 @@ Per `AGENTS.md`, check at least:
 | MissionPlanner | https://github.com/ArduPilot/MissionPlanner | search if no clone | `ExtLibs/Mavlink/`, `GCSViews/`, `Controls/` |
 
 Local clones may be stale: note the commit you searched (`git -C <clone> log -1 --format=%h`), and if it's more than a few weeks old, search the default branch via `gh search code` or the GitHub API instead or as well.
-Search for the generated identifiers, not just the XML names: `MAVLINK_MSG_ID_<NAME>`, `mavlink_msg_<name>_pack`/`_decode`/`_send`, `mavlink_<name>_t`, `MAV_CMD_<NAME>`, the enum entry name, and for Python/C# the `MAVLink_<name>_message`/`mavlink_<name>_t` forms.
+Search for the generated identifiers, not just the XML names (these projects generate with upstream mavgen, so they use the `mavlink` names, not this repo's `szlink` rename): `MAVLINK_MSG_ID_<NAME>`, `mavlink_msg_<name>_pack`/`_decode`/`_send`, `mavlink_<name>_t`, `MAV_CMD_<NAME>`, the enum entry name, and for Python/C# the `MAVLink_<name>_message`/`mavlink_<name>_t` forms.
 
 ## What to check, by classification
 

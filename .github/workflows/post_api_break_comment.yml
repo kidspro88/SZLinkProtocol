@@ -34,7 +34,7 @@ name: Post API Break Comment
 # into an unrelated comment to trick this job into editing someone else's.
 on:
   workflow_run:
-    workflows: ["Check MAVLink API Breaks"]
+    workflows: ["Check SZLink API Breaks"]
     types: [completed]
 
 permissions:
@@ -88,7 +88,7 @@ jobs:
           # check_api_break.py), so it's safe to inline into the jq filter as-is.
           existing_id="$(
             gh api "repos/${REPO}/issues/${pr_number}/comments" --paginate \
-              --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- mavlink-api-break-check -->"))) | .id' \
+              --jq '.[] | select(.user.login == "github-actions[bot]" and (.body | startswith("<!-- szlink-api-break-check -->"))) | .id' \
               | tail -n1
           )"
 

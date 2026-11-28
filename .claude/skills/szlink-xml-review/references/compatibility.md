@@ -22,7 +22,7 @@ A clarification that makes explicit what every implementation already does is no
 ## Extension fields
 
 - Extension fields must follow `<extensions/>`, and new ones must be appended after existing extensions — never inserted between them.
-- Their **zero value must mean "not set / behave as before"**, because a receiver on the new XML gets zero from every sender on the old XML (MAVLink 2 zero-fills missing extension bytes, and MAVLink 1 drops extensions entirely). A new extension whose zero is a meaningful, behaviour-changing value is a `bug`.
+- Their **zero value must mean "not set / behave as before"**, because a receiver on the new XML gets zero from every sender on the old XML (MAVLink 2 zero-fills missing extension bytes, and SZLink 1 drops extensions entirely). A new extension whose zero is a meaningful, behaviour-changing value is a `bug`.
   Typical fixes: shift the enum so 0 is `UNKNOWN`/`NOT_SET`, add 1 to the stored value, or use a float with NaN plus prose saying 0 and NaN are both "not set" — whichever reads naturally for the field.
 - The same applies in reverse: a sender on the new XML talking to an old receiver has its extension silently ignored. If the feature only works when the receiver understands the extension, the PR needs a capability flag or a separate message, and the description must say how the sender knows.
 

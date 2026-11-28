@@ -18,7 +18,7 @@ Documentation:
         <description>RC uplink (SZ_RC_CMD), 50-150 Hz, latency below 20 ms.</description>
       </entry>
       <entry value="1" name="SZ_LCID_TELEMETRY">
-        <description>Telemetry: standard MAVLink messages (HEARTBEAT, GPS_RAW_INT, SYS_STATUS, ATTITUDE, BATTERY_STATUS, ...).</description>
+        <description>Telemetry: standard SZLink messages (HEARTBEAT, GPS_RAW_INT, SYS_STATUS, ATTITUDE, BATTERY_STATUS, ...).</description>
       </entry>
       <entry value="2" name="SZ_LCID_VIDEO">
         <description>Video downlink (SZ_VIDEO_PKT).</description>

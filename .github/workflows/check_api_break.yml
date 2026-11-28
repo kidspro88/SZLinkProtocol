@@ -1,4 +1,4 @@
-name: Check MAVLink API Breaks
+name: Check SZLink API Breaks
 
 on:
   pull_request:

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<!-- ASLUAV Mavlink Message Definition File -->
+<!-- ASLUAV SZLink Message Definition File -->
 <!-- Used for the ASLUAV fixed-wing autopilot (www.asl.ethz.ch), which implements extensions to the Pixhawk (https://docs.px4.io/en/flight_controller/pixhawk.html) autopilot -->
 <mavlink>
   <include>common.xml</include>
@@ -270,7 +270,7 @@
       <field type="uint8_t" name="sinr_ecio">SINR (LTE) or ECIO (WCDMA) as reported by modem (unconverted)</field>
       <field type="uint8_t" name="rsrq">RSRQ (LTE only) as reported by modem (unconverted)</field>
     </message>
-    <!-- Using mavlink 1 msg ID from the arudpilot reserved space, in order to save header size -->
+    <!-- Using MAVLink 1 msg ID from the arudpilot reserved space, in order to save header size -->
     <message id="8015" name="SATCOM_LINK_STATUS">
       <description>Status of the SatCom link</description>
       <field type="uint64_t" name="timestamp" units="us">Timestamp</field>

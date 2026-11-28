@@ -115,7 +115,7 @@
     </enum>
     <!-- The MAV_CMD enum entries describe either: -->
     <!--  * the data payload of mission items (as used in the MISSION_ITEM_INT message) -->
-    <!--  * the data payload of mavlink commands (as used in the COMMAND_INT and COMMAND_LONG messages) -->
+    <!--  * the data payload of szlink commands (as used in the COMMAND_INT and COMMAND_LONG messages) -->
     <!-- ALL the entries in the MAV_CMD enum have a maximum of 7 parameters -->
     <enum name="MAV_CMD">
       <description>Commands to be executed by the MAV. They can be executed on user request, or as part of a mission script. If the action is used in a mission, the parameter mapping to the waypoint/mission message is as follows: Param 1, Param 2, Param 3, Param 4, X: Param 5, Y:Param 6, Z:Param 7. This command list is similar what ARINC 424 is for commercial aircraft: A data format how to interpret waypoint/mission data. NaN and INT32_MAX may be used in float/integer params (respectively) to indicate optional/default values (e.g. to use the component's current yaw or latitude rather than a specific value). See https://mavlink.io/en/guide/xml_schema.html#MAV_CMD for information about the structure of the MAV_CMD entries</description>
@@ -147,13 +147,13 @@
         <!-- This command is work-in-progress and it can therefore change. It should NOT be used in stable production environments. -->
         <description>Enable Moving Target Indicators (MTI) on streamed video.
           Support for feature can be checked with CAMERA_CAP_FLAGS_HAS_MTI, and disabled with MAV_CMD_CAMERA_STOP_MTI.</description>
-        <param index="1" label="Target Camera ID" minValue="0" maxValue="255" increment="1">Target camera ID. 7 to 255: MAVLink camera component id. 1 to 6 for cameras attached to the autopilot, which don't have a distinct component id. 0: all cameras. This is used to target specific autopilot-connected cameras. It is also used to target specific cameras when the MAV_CMD is used in a mission.</param>
+        <param index="1" label="Target Camera ID" minValue="0" maxValue="255" increment="1">Target camera ID. 7 to 255: SZLink camera component id. 1 to 6 for cameras attached to the autopilot, which don't have a distinct component id. 0: all cameras. This is used to target specific autopilot-connected cameras. It is also used to target specific cameras when the MAV_CMD is used in a mission.</param>
       </entry>
       <entry value="2021" name="MAV_CMD_CAMERA_STOP_MTI" hasLocation="false" isDestination="false" command="true">
         <wip since="2025-08"/>
         <!-- This command is work-in-progress and it can therefore change. It should NOT be used in stable production environments. -->
         <description>Disable Moving Target Indicators (MTI) on streamed video.</description>
-        <param index="1" label="Target Camera ID" minValue="0" maxValue="255" increment="1">Target camera ID. 7 to 255: MAVLink camera component id. 1 to 6 for cameras attached to the autopilot, which don't have a distinct component id. 0: all cameras. This is used to target specific autopilot-connected cameras. It is also used to target specific cameras when the MAV_CMD is used in a mission.</param>
+        <param index="1" label="Target Camera ID" minValue="0" maxValue="255" increment="1">Target camera ID. 7 to 255: SZLink camera component id. 1 to 6 for cameras attached to the autopilot, which don't have a distinct component id. 0: all cameras. This is used to target specific autopilot-connected cameras. It is also used to target specific cameras when the MAV_CMD is used in a mission.</param>
       </entry>
       <entry value="12900" name="MAV_CMD_ODID_SET_EMERGENCY" hasLocation="false" isDestination="false" command="true">
         <wip since="2024-02"/>
@@ -198,7 +198,7 @@
           - In multi-owner mode the flight stack allows multiple GCS to be "owners" and send (most) state changing operations (which GCS those are is implementation-dependent, and not controlled by this protocol).
             However only one GCS owner can control manual input of the vehicle: this command can be used to request takeover of that ownership role.
 
-          A controlled system should only accept MAVLink operations that change the state of the vehicle, such as commands and command-like messages, which are sent by its controlling GCS(s) (or from other components in its own system/with the same system id, such as a companion computer).
+          A controlled system should only accept SZLink operations that change the state of the vehicle, such as commands and command-like messages, which are sent by its controlling GCS(s) (or from other components in its own system/with the same system id, such as a companion computer).
           Commands to control the vehicle from other systems should be rejected with MAV_RESULT_NOT_IN_CONTROL (except for this command, which may be acknowledged with MAV_RESULT_ACCEPTED if control is granted).
           Messages and commands that don't control or change vehicle movement or functionality, such as telemetry requests, may still be send from (and to) a controlled system.
 
@@ -480,10 +480,10 @@
         <description>Manual input messages are being provided by a radio control (RC) receiver.</description>
       </entry>
       <entry value="2" name="MAV_MANUAL_INPUT_SOURCE_MAVLINK">
-        <description>Manual input messages are being provided by a MAVLink enabled input device (e.g. via MANUAL_CONTROL messages). The specific device is identified by the sender_system_id and sender_component_id fields.</description>
+        <description>Manual input messages are being provided by an SZLink enabled input device (e.g. via MANUAL_CONTROL messages). The specific device is identified by the sender_system_id and sender_component_id fields.</description>
       </entry>
       <entry value="3" name="MAV_MANUAL_INPUT_SOURCE_MIXED">
-        <description>Manual input messages are being provided simultaneously by both a radio control (RC) receiver and a MAVLink enabled input device.</description>
+        <description>Manual input messages are being provided simultaneously by both a radio control (RC) receiver and an SZLink enabled input device.</description>
       </entry>
     </enum>
     <enum name="EFI_PERFORMANCE_STATUS_FLAGS" bitmask="true">
@@ -798,7 +798,7 @@
       <wip since="2026-03"/>
       <!-- This message is work-in-progress and it can therefore change. It should NOT be used in stable production environments. -->
       <description>Range information from a radio beacon for trilateration-based positioning.
-        This message is telemetry intended for consumption by an autopilot (MAVLink does not define the mechanism used to determine the range).
+        This message is telemetry intended for consumption by an autopilot (SZLink does not define the mechanism used to determine the range).
       </description>
       <field type="uint64_t" name="time_usec" units="us">Timestamp (UNIX Epoch time or time since system boot). The receiving end can infer timestamp format (since 1.1.1970 or since system boot) by checking for the magnitude of the number.</field>
       <field type="uint8_t" name="target_system">System ID.</field>
@@ -827,10 +827,10 @@
     <message id="515" name="MANUAL_INPUT_STATUS">
       <wip since="2026-08"/>
       <!-- This message is work-in-progress and it can therefore change. It should NOT be used in stable production environments. -->
-      <description>Status of the manual control input arbitration on the autopilot: which source is currently active and, when a MAVLink enabled input device is selected, which system/component is providing it. Emitted by the autopilot for ground stations to display the active manual control source.</description>
+      <description>Status of the manual control input arbitration on the autopilot: which source is currently active and, when an SZLink enabled input device is selected, which system/component is providing it. Emitted by the autopilot for ground stations to display the active manual control source.</description>
       <field type="uint8_t" name="source" enum="MAV_MANUAL_INPUT_SOURCE">Current manual control source active.</field>
-      <field type="uint8_t" name="sender_system_id">System ID of the MAVLink enabled input device currently providing manual control. Set whenever a MAVLink enabled input device is contributing, i.e. for both MAV_MANUAL_INPUT_SOURCE_MAVLINK and MAV_MANUAL_INPUT_SOURCE_MIXED. 0 otherwise.</field>
-      <field type="uint8_t" name="sender_component_id">Component ID of the MAVLink enabled input device currently providing manual control. Set whenever a MAVLink enabled input device is contributing, i.e. for both MAV_MANUAL_INPUT_SOURCE_MAVLINK and MAV_MANUAL_INPUT_SOURCE_MIXED. 0 otherwise.</field>
+      <field type="uint8_t" name="sender_system_id">System ID of the SZLink enabled input device currently providing manual control. Set whenever an SZLink enabled input device is contributing, i.e. for both MAV_MANUAL_INPUT_SOURCE_MAVLINK and MAV_MANUAL_INPUT_SOURCE_MIXED. 0 otherwise.</field>
+      <field type="uint8_t" name="sender_component_id">Component ID of the SZLink enabled input device currently providing manual control. Set whenever an SZLink enabled input device is contributing, i.e. for both MAV_MANUAL_INPUT_SOURCE_MAVLINK and MAV_MANUAL_INPUT_SOURCE_MIXED. 0 otherwise.</field>
     </message>
     <message id="442" name="EFI_PERFORMANCE">
       <wip since="2026-08"/>

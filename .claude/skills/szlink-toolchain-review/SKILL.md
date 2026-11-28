@@ -1,12 +1,12 @@
 ---
-name: mavlink-toolchain-review
-description: Reviews changes to the mavlink/mavlink toolchain — the XML check scripts (scripts/check_api_break.py, xml_consistency_check.py, format_xml.sh, test.sh, the C library update scripts), the doc generator (doc/mavlink_xml_to_markdown.py), GitHub workflows, CMake/examples, and pymavlink submodule bumps (generator and XSD). Proves by execution that a fix actually catches the problem it claims to (fails at base, passes at head, and the PR's own tests fail against the base code), checks nothing else changed across every dialect, probes sibling cases the fix misses, checks CI wiring and workflow security, and checks the change neither breaks nor is unusable by downstream consumers (PX4 and ArduPilot builds, c_library_v2, mavlink-devguide, pymavlink users). Use when reviewing a mavlink/mavlink PR (by number or URL) or local branch touching those paths, and consult it proactively when writing a toolchain change yourself. XML definition changes belong to mavlink-xml-review; a mixed PR is split between the two.
+name: szlink-toolchain-review
+description: Reviews changes to the kidspro88/SZLinkProtocol toolchain — the XML check scripts (scripts/check_api_break.py, xml_consistency_check.py, format_xml.sh, test.sh, the C library update scripts), the doc generator (doc/szlink_xml_to_markdown.py), GitHub workflows, CMake/examples, and pymavlink submodule bumps (generator and XSD). Proves by execution that a fix actually catches the problem it claims to (fails at base, passes at head, and the PR's own tests fail against the base code), checks nothing else changed across every dialect, probes sibling cases the fix misses, checks CI wiring and workflow security, and checks the change neither breaks nor is unusable by downstream consumers (PX4 and ArduPilot builds, c_library_v2, mavlink-devguide, pymavlink users). Use when reviewing a kidspro88/SZLinkProtocol PR (by number or URL) or local branch touching those paths, and consult it proactively when writing a toolchain change yourself. XML definition changes belong to szlink-xml-review; a mixed PR is split between the two.
 allowed-tools: Bash(gh pr view:*) Bash(gh pr diff:*) Bash(gh pr list:*) Bash(gh api:*) Bash(git -C:*) Bash(git worktree:*) Bash(grep:*) Bash(python3:*) Bash(python:*)
 ---
 
-# MAVLink toolchain review
+# SZLink toolchain review
 
-You are reviewing the tools that check, generate and publish the MAVLink schema.
+You are reviewing the tools that check, generate and publish the SZLink schema.
 A toolchain PR usually claims "this now catches X" or "this now generates Y correctly". Reading the diff can't establish that; running it can.
 So this review is execution-first: every claim the PR makes about behaviour is tested against the base and head code, and the result is the evidence.
 
@@ -31,7 +31,7 @@ Two modes:
 
 ### 1. Scope
 
-A bare PR number means `mavlink/mavlink`.
+A bare PR number means `kidspro88/SZLinkProtocol`.
 Stop and say so if the PR is closed, merged, or a dependabot bump with no behaviour change (a dependabot action-version bump still gets the `ci-security.md` check — run only that lens).
 
 Read the PR description and linked issue. Extract, in one sentence each:
@@ -48,13 +48,13 @@ If either is missing or vague, say so in the report; then infer them from the di
 | check script | `scripts/*.py`, `scripts/*.sh`, `scripts/xml_consistency_allowlist.txt` |
 | doc generator | `doc/**` |
 | workflow | `.github/workflows/*`, `.github/*.yml` |
-| build | `CMakeLists.txt`, `MAVLinkConfig.cmake.in`, `examples/**` |
+| build | `CMakeLists.txt`, `SZLinkConfig.cmake.in`, `examples/**` |
 | pymavlink bump | the `pymavlink` submodule pointer |
-| XML | `message_definitions/**` — hand to `mavlink-xml-review` in one line; don't review here |
+| XML | `message_definitions/**` — hand to `szlink-xml-review` in one line; don't review here |
 
 For a **pymavlink bump**, list the upstream commits: `git -C pymavlink fetch origin && git -C pymavlink log --oneline <base-ptr>..<head-ptr>` (upstream is https://github.com/ArduPilot/pymavlink). Each upstream commit with a behavioural claim gets the fix-proof treatment; note that the review is of the bump, and that code findings belong upstream in ArduPilot/pymavlink.
 
-**Reviewer preferences.** Load `~/.config/mavlink-toolchain-review/preferences.md` if it exists (skip silently if not); same limits as the other MAVLink review skills — preferences never override sources of truth, the read-only rule, or evidence.
+**Reviewer preferences.** Load `~/.config/szlink-toolchain-review/preferences.md` if it exists (skip silently if not); same limits as the other SZLink review skills — preferences never override sources of truth, the read-only rule, or evidence.
 
 ### 2. Setup
 
@@ -75,11 +75,11 @@ Spawn one subagent per applicable lens:
 
 Pass each this prompt, filling the slots, as written:
 
-> You are the [lens] lens of a mavlink/mavlink toolchain review, and you are read-only: never modify the reviewer's checkout, never push, and never run `gh pr comment`, `gh pr review`, or any other write operation. Run code only inside the scratch worktrees below.
+> You are the [lens] lens of a kidspro88/SZLinkProtocol toolchain review, and you are read-only: never modify the reviewer's checkout, never push, and never run `gh pr comment`, `gh pr review`, or any other write operation. Run code only inside the scratch worktrees below.
 >
 > Read ${CLAUDE_SKILL_DIR}/references/shared.md in full, then ${CLAUDE_SKILL_DIR}/references/[lens-file].md in full. Those two files are your instructions.
 >
-> Repository mavlink/mavlink, PR [number], head SHA [sha], base SHA [sha].
+> Repository kidspro88/SZLinkProtocol, PR [number], head SHA [sha], base SHA [sha].
 > Base worktree: [path]. Head worktree: [path]. Python venv: [path]. Scratch dir for your output: [path].
 > Changed files and class: [list]. For pymavlink bumps, upstream commits: [list].
 > The problem, as stated or inferred: [one sentence]. The claim: [one sentence].
@@ -140,4 +140,4 @@ One line per Suggestion; longer code suggestions go below, keyed to file and lin
 4. Pre-existing issues the review ran into but the PR didn't cause
 5. A note if the description was empty, the problem had to be inferred, or the review ran in one context
 
-Cite lines as `https://github.com/mavlink/mavlink/blob/<full-head-sha>/scripts/check_api_break.py#L438`.
+Cite lines as `https://github.com/kidspro88/SZLinkProtocol/blob/<full-head-sha>/scripts/check_api_break.py#L438`.

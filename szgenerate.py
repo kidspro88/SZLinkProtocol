@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 """\
-mavgenerate.py is a GUI front-end for mavgen, a python based MAVLink
+szgenerate.py is a GUI front-end for mavgen, a python based SZLink
 header generation tool.
 
 Notes:
@@ -30,7 +30,7 @@ import tkinter.messagebox
 from pymavlink.generator import mavgen
 from pymavlink.generator import mavparse
 
-title = "MAVLink Generator"
+title = "SZLink Generator"
 
 
 class Application(Frame):
@@ -134,8 +134,8 @@ class Application(Frame):
     headers.
     """
     def browseOutDirectory(self):
-        mavlinkFolder = os.path.dirname(os.path.realpath(__file__))
-        out_dir = tkinter.filedialog.askdirectory(parent=self,initialdir=mavlinkFolder,title='Please select an output directory')
+        szlinkFolder = os.path.dirname(os.path.realpath(__file__))
+        out_dir = tkinter.filedialog.askdirectory(parent=self,initialdir=szlinkFolder,title='Please select an output directory')
         if out_dir is not None:
             self.out_value.set(out_dir)
 

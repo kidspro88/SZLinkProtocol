@@ -18,6 +18,6 @@ apidocs/
 include/
 .tags*
 *.pyc
-include/mavlink/v1.0
+include/szlink/v1.0
 .idea
 /.vscode

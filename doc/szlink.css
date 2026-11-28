@@ -49,26 +49,26 @@ table.sortable td {
     vertical-align: top;
 }
 
-table.sortable td.mavlink_name {
+table.sortable td.szlink_name {
     color:#226633;
     font-weight: bold;
     width: 25%;
     vertical-align: top;
 }
 
-table.sortable td.mavlink_mission_param {
+table.sortable td.szlink_mission_param {
     color:#334455;
     font-weight: bold;
     width: 25%;
 }
 
-table.sortable td.mavlink_type {
+table.sortable td.szlink_type {
     color:#323232;
     font-weight: normal;
     width: 12%;
 }
 
-table.sortable td.mavlink_comment {
+table.sortable td.szlink_comment {
     color:#555555;
     font-weight: normal;
     width: 60%;

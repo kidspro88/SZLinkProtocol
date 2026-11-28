@@ -1,6 +1,6 @@
 #! /usr/bin/env python3
 """
-Script to check for breaking changes in the MAVLink API.
+Script to check for breaking changes in the SZLink API.
 
 This script checks for the following changes:
 * Break: Removal/Rename of fields and enum entries
@@ -125,7 +125,7 @@ FIX_TYPE_ADVICE = (
 
 
 def collect_names(root: etree._Element) -> Tuple[Dict[NameKey, bool], Dict[NameKey, Dict[str, Any]]]:
-    """Collect names and wire-critical attributes (id, type, value) from a MAVLink XML root.
+    """Collect names and wire-critical attributes (id, type, value) from an SZLink XML root.
 
     Raises ValueError naming every field whose size is unknown."""
     names = {}
@@ -308,7 +308,7 @@ def get_base_commit(base_override: Optional[str] = None) -> str:
         print(f"Diffing against CI event base commit {resolved}.", file=sys.stderr)
         return resolved
 
-    env_base = os.getenv("MAVLINK_BASE_REF") or os.getenv("GITHUB_BASE_REF")
+    env_base = os.getenv("SZLINK_BASE_REF") or os.getenv("GITHUB_BASE_REF")
     candidates: List[str] = []
     if env_base:
         candidates.extend([f"origin/{env_base}", f"upstream/{env_base}", env_base])
@@ -354,7 +354,7 @@ def get_base_commit(base_override: Optional[str] = None) -> str:
 
     raise RuntimeError(
         "Could not determine base commit. Please specify a base branch using "
-        "--base <ref> or the MAVLINK_BASE_REF environment variable."
+        "--base <ref> or the SZLINK_BASE_REF environment variable."
     )
 
 def get_changed_xml_files(base: str) -> List[str]:
@@ -539,7 +539,7 @@ def find_added_wire_fields(
 # Identifies the bot's own comment across runs so it can be updated in place
 # instead of accumulating a new comment on every push. Must stay in sync with
 # the marker check in post_api_break_comment.yml.
-COMMENT_MARKER = "<!-- mavlink-api-break-check -->"
+COMMENT_MARKER = "<!-- szlink-api-break-check -->"
 
 
 def build_removal_comment(
@@ -553,7 +553,7 @@ def build_removal_comment(
     lines: List[str] = [COMMENT_MARKER, ""]
 
     if removed_by_file:
-        lines.extend(["Detected removed MAVLink messages or enums:", ""])
+        lines.extend(["Detected removed SZLink messages or enums:", ""])
         for xml in sorted(removed_by_file):
             lines.append(f"- `{xml}`")
             for name in sorted(removed_by_file[xml], key=describe_key):
@@ -600,7 +600,7 @@ def build_removal_comment(
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Check for breaking changes in MAVLink XML definitions.")
+    parser = argparse.ArgumentParser(description="Check for breaking changes in SZLink XML definitions.")
     parser.add_argument(
         "-b",
         "--base",

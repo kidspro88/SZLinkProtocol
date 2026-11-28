@@ -18,13 +18,13 @@ test_format() {
     echo PASS
 }
 
-generate_mavlink() {
+generate_headers() {
     echo "$sep"
-    echo "GENERATING MAVLINK " \
+    echo "GENERATING HEADERS WITH MAVGEN " \
 	    "protocol:${wire_protocol} language:${lang}"
     echo "DEFINITION : " "$msg_def"
     echo "$sep"
-    outdir="/tmp/mavlink_${wire_protocol}_${lang}"
+    outdir="/tmp/szlink_mavgen_${wire_protocol}_${lang}"
     pymavlink/tools/mavgen.py --lang="${lang}" \
 	    --wire-protocol "${wire_protocol}" \
 	    --strict-units \
@@ -39,6 +39,8 @@ generate_mavlink() {
 compile_generated() {
     dialect=$(basename "$msg_def" .xml)
     if [ "$lang" == "C" ]; then
+        # Raw mavgen output (szlinkgen is not used here), so the C umbrella
+        # header keeps mavgen's own file name.
         echo "#include \"${dialect}/mavlink.h\"" |
             gcc -fsyntax-only -Wno-address-of-packed-member \
                 -I"${outdir}" -x c -
@@ -57,12 +59,12 @@ test_py() {
         wire_protocol="1.0"
         for lang in Python C CS WLua Java
         do
-            generate_mavlink
+            generate_headers
         done
         wire_protocol="2.0"
         for lang in Python C C++11 CS WLua Java
         do
-            generate_mavlink
+            generate_headers
         done
     done
 }

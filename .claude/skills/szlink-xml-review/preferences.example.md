@@ -1,6 +1,6 @@
 # Reviewer preferences
 
-Copy this file to `~/.config/mavlink-xml-review/preferences.md` and edit it there.
+Copy this file to `~/.config/szlink-xml-review/preferences.md` and edit it there.
 The skill loads only that exact path, and skips it silently if absent, so an empty or missing file gives the defaults.
 It lives outside the repo so your preferences don't reach anyone else.
 

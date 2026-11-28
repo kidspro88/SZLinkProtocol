@@ -12,13 +12,13 @@ Did anything change that the PR didn't intend? The fixture proves the target cas
 
 ## Doc generator
 
-- Run `doc/mavlink_xml_to_markdown.py` on base and head (as `docs_build_and_deploy.yml` does), diff the output directory. Expected changes only; call out anything else by dialect and definition.
+- Run `doc/szlink_xml_to_markdown.py` on base and head (as `docs_build_and_deploy.yml` does), diff the output directory. Expected changes only; call out anything else by dialect and definition.
 - Spot-check the rendered markdown of the intended change (does the table/badge/link render as the PR's screenshot or description says?).
 
 ## pymavlink bumps and generator changes
 
 - Generate on base and head for every language CI covers (`scripts/test.sh py`: Python, C, CS, WLua, Java for 1.0; plus C++11 for 2.0) on at least `common.xml`, `development.xml`, `all.xml`, and `ardupilotmega.xml`, into scratch dirs, and diff.
-- Any change in **wire-relevant output** — `CRC_EXTRA`, message lengths, field offsets, field order, message IDs, the `MAVLINK_MESSAGE_CRCS` table — is a `bug` unless the bump's commits explain it as intended and it's accompanied by a protocol decision.
+- Any change in **wire-relevant output** — `CRC_EXTRA`, message lengths, field offsets, field order, message IDs, the `SZLINK_MESSAGE_CRCS` table — is a `bug` unless the bump's commits explain it as intended and it's accompanied by a protocol decision.
 - Changes in **generated API** (function names, signatures, struct names/members, Python class/attribute names, enum constant names) are downstream breaks: hand to `downstream.md` with the diff.
 - Run pymavlink's own test entry points that CI runs (`test_and_deploy.yml` "Test Python generator" and the Node tests).
 - Run `mavgen.py --strict-units` over every dialect with the new XSD: nothing that passed before may fail now, unless the bump's point is to newly reject it (then the XML must be fixed in the same or a preceding PR).
@@ -26,7 +26,7 @@ Did anything change that the PR didn't intend? The fixture proves the target cas
 ## Build and examples
 
 - Configure and build the C and C++ examples the way `test_and_deploy.yml` does, on base and head.
-- `cmake --install` into a scratch prefix and diff the installed file list and `MAVLinkConfig.cmake`.
+- `cmake --install` into a scratch prefix and diff the installed file list and `SZLinkConfig.cmake`.
 
 ## Return
 

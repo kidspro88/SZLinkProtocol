@@ -1,7 +1,7 @@
 #! /usr/bin/python
 
 """
-This script generates markdown files for the MAVLink message definition XML at:
+This script generates markdown files for the SZLink message definition XML at:
 https://github.com/mavlink/mavlink/tree/master/message_definitions/v1.0
 
 The files can be imported into a markdown SSG to display the messages as HTML
@@ -11,7 +11,7 @@ The following libraries must be imported:
 - bs4.
 - lxml
 
-The file is run in mavlink/doc/ with no arguments.
+The file is run in szlink/doc/ with no arguments.
 It writes the files to /messages/
 It can also be run for a specific dialect, if specified.
 It can also be imported and used to get information about the XML.
@@ -30,7 +30,7 @@ MAXIMUM_INCLUDE_FILE_NESTING = 5
 
 
 class MAVXML:
-    """Represents a MAVLink XML file"""
+    """Represents an SZLink XML file"""
 
     def __init__(self, filename):
         self.filename = filename
@@ -198,7 +198,7 @@ class MAVXML:
             markdownText += f"**Protocol version:** {self.version}\n\n"
 
         # Generate include files docs
-        markdownText += "## MAVLink Include Files\n\n"
+        markdownText += "## SZLink Include Files\n\n"
         if self.includes:
             base_path = "../messages/"
             # Create a list of formatted strings
@@ -277,32 +277,32 @@ class MAVXML:
         insert_text = "<!-- THIS FILE IS AUTO-GENERATED: https://github.com/mavlink/mavlink/blob/master/doc/mavlink_xml_to_markdown.py -->\n"
         if filename == "common":
             insert_text += """
-# MAVLINK Common Message Set (common.xml)
+# SZLINK Common Message Set (common.xml)
 
-The MAVLink *common* message set contains *standard* definitions that are managed by the MAVLink project.
+The SZLink *common* message set contains *standard* definitions that are managed by the SZLink project (inherited from upstream).
 The definitions cover functionality that is considered useful to most ground control stations and autopilots.
-MAVLink-compatible systems are expected to use these definitions where possible (if an appropriate message exists) rather than rolling out variants in their own [dialects](../messages/README.md).
+SZLink-compatible systems are expected to use these definitions where possible (if an appropriate message exists) rather than rolling out variants in their own [dialects](../messages/README.md).
 
 The original definitions are defined in [common.xml](https://github.com/mavlink/mavlink/blob/master/message_definitions/v1.0/common.xml).
 """
         elif filename == "minimal":
             insert_text += """
-# MAVLink Minimal Set (minimal.xml)
+# SZLink Minimal Set (minimal.xml)
 
-The MAVLink *minimal* set contains the minimal set of definitions for a viable MAVLink system.
+The SZLink *minimal* set contains the minimal set of definitions for a viable SZLink system.
 
-The message set is defined in [minimal.xml](https://github.com/mavlink/mavlink/blob/master/message_definitions/v1.0/minimal.xml) and is managed by the MAVLink project.
+The message set is defined in [minimal.xml](https://github.com/mavlink/mavlink/blob/master/message_definitions/v1.0/minimal.xml) and is managed by the SZLink project (inherited from upstream).
 
 ::: tip
-The minimal set is included (imported into) other xml definition files, including the [MAVLink Common Message Set (common.xml)](minimal.md).
+The minimal set is included (imported into) other xml definition files, including the [SZLink Common Message Set (common.xml)](minimal.md).
 :::
 
 """
         elif filename == "standard":
             insert_text += """
-# Dialect: MAVLINK Standard Message Set (standard.xml)
+# Dialect: SZLINK Standard Message Set (standard.xml)
 
-The MAVLink *standard* message set contains *standard* definitions that are managed by the MAVLink project.
+The SZLink *standard* message set contains *standard* definitions that are managed by the SZLink project (inherited from upstream).
 The definitions are those that are expected to be implemented in all flight stacks/ground stations
 AND are likely to be implemented in a compatible way.
 The original definitions are defined in [standard.xml](https://github.com/mavlink/mavlink/blob/master/message_definitions/v1.0/standard.xml).
@@ -334,7 +334,7 @@ This dialect is intended to `include` all other [dialects](../messages/README.md
 Dialects that are in **all.xml** are guaranteed to not have clashes in messages, enums, enum ids, and MAV_CMDs.
 This ensure that:
 
-- Systems based on these dialects can co-exist on the same MAVLink network.
+- Systems based on these dialects can co-exist on the same SZLink network.
 - A Ground Station might (optionally) use libraries generated from **all.xml** to communicate using any of the dialects.
 
 ::: warning
@@ -742,7 +742,7 @@ class MAVMessage:
                 else ""
             )
             instanceText = (
-                "<br>[Instance field]: Uniquely identifies a device/subcomponent within a single source/target MAVLink component."
+                "<br>[Instance field]: Uniquely identifies a device/subcomponent within a single source/target SZLink component."
                 if field.instance
                 else ""
             )
@@ -1342,7 +1342,7 @@ class XMLFiles:
         # initialise text for index file.
         index_text = """<!-- THIS FILE IS AUTO-GENERATED FROM XML: https://github.com/mavlink/mavlink/blob/master/doc/mavlink_xml_to_markdown.py (Do not update mavlink-devguide) -->
 
-# MAVLink-Standard Definitions
+# SZLink-Standard Definitions
 
 The following XML definition files are part of the standard set that are managed by this project.
 They contain messages, commands, and enums that are expected to be used in multiple flight stacks and ground stations:
@@ -1354,7 +1354,7 @@ They contain messages, commands, and enums that are expected to be used in multi
   :::
 
 - [standard.xml](standard.md) — the standard set of entities that are implemented by at least two core flight stacks, in a compatible way.
-- [minimal.xml](minimal.md) — the minimum set of entities (messages, enums, MAV_CMD) required to set up a MAVLink network.
+- [minimal.xml](minimal.md) — the minimum set of entities (messages, enums, MAV_CMD) required to set up an SZLink network.
 
 ::: info
 See [Dialects & Test Definitions](dialects.md) for flight-stack specific XML definitions.
@@ -1372,7 +1372,7 @@ They are a "work in progress" and should not be used in released software.
 
 - [Dialects & Test Definitions](dialects.md)
 - [XSD schema](../guide/xml_schema.md)
-- [mavlink/message_definitions](https://github.com/mavlink/mavlink/blob/master/message_definitions/) - Source of all XML definition files
+- [szlink/message_definitions](https://github.com/mavlink/mavlink/blob/master/message_definitions/) - Source of all XML definition files
 
 """
         # Write the index
@@ -1396,14 +1396,14 @@ They are a "work in progress" and should not be used in released software.
 
 ## Dialects
 
-MAVLink _dialects_ are XML definition files that define _protocol-_ and _vendor-specific_ messages, enums and commands.
+SZLink _dialects_ are XML definition files that define _protocol-_ and _vendor-specific_ messages, enums and commands.
 
 ::: warning
 Dialects are not managed by this project!
 
 - They are typically used in only one particular flight stack, and are managed by that flight stack.
   The XML usually includes owner information as a header comment.
-- Vendor forks of MAVLink may contain XML entities that have not yet been pushed into the main repository (and will not be documented).
+- Vendor forks of SZLink may contain XML entities that have not yet been pushed into the main repository (and will not be documented).
 
 :::
 
@@ -1425,9 +1425,9 @@ The dialect definitions are:
                 dialect_text += f"- [{xmlfile}.xml]({xmlfile}.md)\n"
 
         dialect_text += """
-Note that dialects may `include` [MAVLink-Standard Definitions](index.md) or other dialects.
+Note that dialects may `include` [SZLink-Standard Definitions](index.md) or other dialects.
 Up to 5 levels of XML file nesting are allowed - see `MAXIMUM_INCLUDE_FILE_NESTING` in [mavgen.py](https://github.com/ArduPilot/pymavlink/blob/master/generator/mavgen.py#L44).
-A typical pattern is for a dialect to include [common.xml](../messages/common.md) (containing the _MAVLink standard definitions_), extending it with vendor or protocol specific messages.
+A typical pattern is for a dialect to include [common.xml](../messages/common.md) (containing the _SZLink standard definitions_), extending it with vendor or protocol specific messages.
 
 ## Test Definitions
 
@@ -1439,9 +1439,9 @@ The following definitions are used for testing and dialect validation:
 
 ## See Also
 
-- [MAVLink-Standard Definitions](index.md)
+- [SZLink-Standard Definitions](index.md)
 - [XSD schema](../guide/xml_schema.md)
-- [mavlink/message_definitions](https://github.com/mavlink/mavlink/blob/master/message_definitions/) - Source of all XML definition files
+- [szlink/message_definitions](https://github.com/mavlink/mavlink/blob/master/message_definitions/) - Source of all XML definition files
 
 """
 
@@ -1563,7 +1563,7 @@ The following definitions are used for testing and dialect validation:
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Markdown Generator for MAVLink Docs from XML"
+        description="Markdown Generator for SZLink Docs from XML"
     )
 
     parser.add_argument(

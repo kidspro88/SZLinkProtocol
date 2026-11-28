@@ -1,6 +1,6 @@
 # Reviewer preferences
 
-Copy this file to `~/.config/mavlink-toolchain-review/preferences.md` and edit it there.
+Copy this file to `~/.config/szlink-toolchain-review/preferences.md` and edit it there.
 The skill loads only that exact path, and skips it silently if absent, so an empty or missing file gives the defaults.
 It lives outside the repo so your preferences don't reach anyone else.
 
@@ -13,7 +13,7 @@ They cannot override the sources of truth, the read-only and sandboxing rules, o
 
 ## Emphasis
 
-<!-- e.g. For pymavlink bumps, always build PX4's mavlink generation step against head. -->
+<!-- e.g. For pymavlink bumps, always build PX4's szlink generation step against head. -->
 
 ## Suppression
 

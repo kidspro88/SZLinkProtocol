@@ -10,7 +10,7 @@ Field-level rules are `definition-quality.md`'s; this lens asks whether the mess
 
 ## Prior art
 
-MAVLink messages frequently bridge to other buses and standards; aligning with them avoids lossy conversion and borrows years of design review.
+SZLink messages frequently bridge to other buses and standards; aligning with them avoids lossy conversion and borrows years of design review.
 
 - **DroneCAN** — DSDL at https://github.com/dronecan/DSDL (`uavcan/equipment/…`, `dronecan/…`, `ardupilot/…`). For any message describing a peripheral (battery, ESC, GNSS, rangefinder, airspeed, fuel tank, servo, hygrometer, …), find the DroneCAN equivalent and compare field by field: set of fields, units, resolution, types, invalid values, flags. Also Cyphal's `public_regulated_data_types` where no DroneCAN type exists.
 - **Other standards** named by the domain — ASTM F3411 / ASD-STAN for Remote ID, NMEA/RTCM for GNSS, SMBus Smart Battery Data for batteries, ONVIF/camera-definition conventions for cameras, ADS-B / DO-260 for traffic.

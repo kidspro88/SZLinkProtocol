@@ -37,9 +37,9 @@ In precedence order. When two genuinely contradict each other, report the contra
 
 1. **The XML at the base and head SHAs**, and mavgen's view of it (wire layout, CRC_EXTRA).
 2. **`pymavlink/generator/mavschema.xsd`**: which attributes exist and what they mean (`units`, `invalid`, `reserved`, `default`, `multiplier`, `instance`, `hasLocation`, …).
-3. **The MAVLink Developer Guide** (mavlink.io, source at https://github.com/mavlink/mavlink-devguide; local clone at `~/github/mavlink/mavlink-devguide` if present) — `en/guide/define_xml_element.md`, `en/guide/xml_schema.md`, `en/guide/serialization.md`, `en/guide/mavlink_version.md`, and the relevant `en/services/*.md` for the protocol a message belongs to. This is where the project's written rules live; cite it when a finding rests on a convention.
+3. **The upstream protocol Developer Guide** (mavlink.io, source at https://github.com/mavlink/mavlink-devguide; local clone at `~/github/mavlink/mavlink-devguide` if present) — `en/guide/define_xml_element.md`, `en/guide/xml_schema.md`, `en/guide/serialization.md`, `en/guide/mavlink_version.md`, and the relevant `en/services/*.md` for the protocol a message belongs to. This is where the project's written rules live; cite it when a finding rests on a convention.
 4. **Existing definitions in common.xml** — for precedent (how similar fields are worded, typed and united).
-5. **Prior art outside MAVLink** — DroneCAN DSDL (https://github.com/dronecan/DSDL), and whatever the PR description or linked issue cites.
+5. **Prior art outside SZLink** — DroneCAN DSDL (https://github.com/dronecan/DSDL), and whatever the PR description or linked issue cites.
 6. **Downstream implementations** — PX4, ArduPilot, QGC, MAVProxy, MissionPlanner (see `downstream.md` for how to reach them).
 7. **Past review comments** on the same PR or linked issue.
 8. **This skill**, last on purpose: everything above it is published.
